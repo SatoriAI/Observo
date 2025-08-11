@@ -1,0 +1,99 @@
+[project]
+name = "observo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+
+requires-python = ">=3.12"
+
+dependencies = [
+    "django>=5.2.5",
+    "django-environ>=0.12.0",
+    "django-health-check>=3.20.0",
+    "django-unfold>=0.64.0",
+    "djangorestframework>=3.16.1",
+    "gunicorn>=23.0.0",
+    "psycopg2-binary>=2.9.10",
+]
+
+[dependency-groups]
+dev = [
+    "django-stubs>=5.2.2",
+    "mypy>=1.17.1",
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
+    "pytest-django>=4.11.1",
+]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "W",   # pycodestyle warnings
+    "UP",  # pyupgrade
+]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true  # Formats code in docstrings.
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "analytics",
+    "observo",
+]
+
+[tool.mypy]
+mypy_path = "analytics/"
+exclude = [
+    "migrations/",
+    "tests/",
+]
+plugins = [
+    "mypy_django_plugin.main"
+]
+ignore_missing_imports = true
+disallow_untyped_defs = true  # Requires annotations on functions
+warn_redundant_casts = true   # Flags unnecessary casts
+warn_unused_ignores = true    # Helps clean up # type: ignor
+
+[tool.django-stubs]
+django_settings_module = "observo.settings"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "observo.settings"
+addopts = "observo --cov --cov-report term-missing --cov-fail-under=85"
+
+[tool.coverage.run]
+source = [
+    "analytics",
+    "observo",
+]
+omit = [
+    "*/__init__.py",
+    "*/migrations/*",
+    "*/tests/*",
+]
+
+[tool.coverage.report]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+]
+
+[tool.codespell]
+skip = [
+    "*/locale/*"
+]
+ignore-words-list = [
+    "assertIn",
+]

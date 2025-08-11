@@ -1,0 +1,27 @@
+exclude: ".badges/"
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace  # Fixes trailing whitespace issues.
+      - id: end-of-file-fixer  # Ensures files end with a single newline.
+      - id: check-added-large-files  # Prevents committing large files
+      - id: mixed-line-ending  # Ensures consistent line endings (defaults to LF).
+      - id: check-yaml  # Validates YAML files for syntax errors.
+      - id: check-toml  # Validates TOML files (e.g., pyproject.toml).
+      - id: check-merge-conflict  # Detects lingering merge conflict markers.
+      - id: debug-statements  # Catches leftover debug statements like pdb imports.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.5
+    hooks:
+      - id: ruff
+        args: [ --fix, --exit-non-zero-on-fix ]
+        # Lints and auto-fixes issues, including unused imports (F401), unused variables (F841),
+        # and import sorting (if I rules are selected in config). Run this before formatting.
+      - id: ruff-format
+        # Applies Black-compatible formatting. Ensures consistent code style.
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+        args: [ --quiet-level=2 ]  # Ignores less common suggestions.

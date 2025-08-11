@@ -1,0 +1,16 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "./Dockerfile"
+
+[deploy]
+preDeployCommand = [
+    "uv run --no-sync --no-dev python observo/manage.py migrate"
+]
+startCommand = """
+    sh -c '
+        cd observo &&
+        uv run --no-sync --no-dev python manage.py collectstatic --no-input &&
+        gunicorn observo.wsgi:application --bind 0.0.0.0:$PORT
+    '
+"""
+healthcheckPath = "/healthcheck/"
