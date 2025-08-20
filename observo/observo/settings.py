@@ -167,3 +167,4 @@ REST_FRAMEWORK = {
 
 # Own Environmental Variables
 IP_SALT = env("IP_SALT")
+CALENDLY_KEY = env("CALENDLY_KEY")

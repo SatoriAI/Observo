@@ -15,14 +15,18 @@ dependencies = [
     "djangorestframework>=3.16.1",
     "gunicorn>=23.0.0",
     "psycopg2-binary>=2.9.10",
-    "pygments>=2.19.2",  # For formatting JSON files
+    "pygments>=2.19.2", # For formatting JSON files
     "pytest>=8.4.1",
+    "requests>=2.32.5",
     "whitenoise>=6.9.0",
 ]
 
 [dependency-groups]
 dev = [
+    "ddt>=1.7.2",
     "django-stubs>=5.2.2",
+    "factory-boy>=3.3.3",
+    "ipython>=9.4.0",
     "mypy>=1.17.1",
     "pre-commit>=4.3.0",
     "pytest-cov>=6.2.1",
@@ -53,6 +57,7 @@ docstring-code-format = true  # Formats code in docstrings.
 known-first-party = [
     "analytics",
     "observo",
+    "utils",
 ]
 
 [tool.mypy]
@@ -74,12 +79,13 @@ django_settings_module = "observo.settings"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "observo.settings"
-addopts = "observo --cov --cov-report term-missing --cov-fail-under=85"
+addopts = "observo/ --cov --cov-report term-missing --cov-fail-under=85"
 
 [tool.coverage.run]
 source = [
     "analytics",
     "observo",
+    "utils",
 ]
 omit = [
     "*/__init__.py",

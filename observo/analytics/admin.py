@@ -1,7 +1,7 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin, StackedInline
 
-from analytics.models import Contact, Survey
+from analytics.models import Contact, Meeting, Survey
 
 
 class ContactInline(StackedInline):
@@ -12,6 +12,31 @@ class ContactInline(StackedInline):
     readonly_fields = (
         "email",
         "description",
+        "created_at",
+    )
+
+
+class MeetingInline(StackedInline):
+    model = Meeting
+    extra = 0
+    max_num = 1
+    can_delete = False
+    fields = (
+        "appeared",
+        "email",
+        "fullname",
+        "timezone",
+        "start",
+        "finish",
+        "name",
+    )
+    readonly_fields = (
+        "email",
+        "fullname",
+        "timezone",
+        "start",
+        "finish",
+        "name",
         "created_at",
     )
 
@@ -45,7 +70,10 @@ class SurveyAdmin(ModelAdmin):
         "created_at",
     )
 
-    inlines = (ContactInline,)
+    inlines = (
+        ContactInline,
+        MeetingInline,
+    )
 
     compressed_fields = True  # Compact long forms
 

@@ -1,8 +1,9 @@
 from rest_framework import serializers
 
 from analytics.enums import PossibleAnswers
-from analytics.models import Contact, Survey
+from analytics.models import Contact, Meeting, Survey
 from analytics.utils.functions import hash_ip
+from utils.clients import CalendlyClient
 
 
 class ContactSerializer(serializers.ModelSerializer):
@@ -14,6 +15,48 @@ class ContactSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+
+
+class MeetingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Meeting
+        fields = "__all__"
+        read_only_fields = (
+            "id",
+            "email",
+            "start",
+            "finish",
+            "name",
+            "created_at",
+            "updated_at",
+        )
+
+    def create(self, validated_data: dict[str, str]) -> Meeting:
+        uri = validated_data["uri"]
+        invitee_uri = validated_data["invitee_uri"]
+
+        calendly_client = CalendlyClient(uri=uri, invitee_uri=invitee_uri)
+
+        event = calendly_client.get_event()
+        invitee = calendly_client.get_invitee()
+
+        obj = Meeting.objects.create(
+            survey=validated_data["survey"],
+            uri=uri,
+            invitee_uri=invitee_uri,
+            # Invitee information
+            email=invitee["email"],
+            nickname=invitee["name"],
+            firstname=invitee["firstname"],
+            lastname=invitee["lastname"],
+            timezone=invitee["timezone"],
+            # Meeting information
+            start=event["start_time"],
+            finish=event["end_time"],
+            name=event["name"],
+        )
+
+        return obj
 
 
 class SurveySerializer(serializers.ModelSerializer):
@@ -39,7 +82,9 @@ class SurveySerializer(serializers.ModelSerializer):
             if not question.strip():
                 raise serializers.ValidationError("Question cannot be empty!")
             if answer not in PossibleAnswers:
-                raise serializers.ValidationError("Answer must be one of the following values: 'A' or 'B'!")
+                raise serializers.ValidationError(
+                    f"Answer must be one of the following values: {' or '.join([a.value for a in PossibleAnswers])}!"
+                )
 
         return value
 

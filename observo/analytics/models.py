@@ -1,6 +1,8 @@
 from django.db import models
 
 from analytics.enums import PossibleAnswers
+from utils.config import RegexPatterns
+from utils.functions import extract_calendly_uuid, extract_path_from_uri
 
 
 class TimestampedModel(models.Model):
@@ -42,3 +44,40 @@ class Contact(TimestampedModel):
 
     def __str__(self) -> str:
         return f"Contact #{self.pk} left by {self.email}"
+
+
+class Meeting(TimestampedModel):
+    survey = models.OneToOneField(Survey, on_delete=models.CASCADE, related_name="meeting")
+
+    uri = models.URLField()
+    invitee_uri = models.URLField()
+
+    # Invitee information
+    email = models.EmailField()
+    nickname = models.CharField(max_length=128, null=True, blank=True)
+    firstname = models.CharField(max_length=255, null=True, blank=True)
+    lastname = models.CharField(max_length=255, null=True, blank=True)
+    timezone = models.CharField(max_length=255, null=True, blank=True)
+
+    # Meeting information
+    start = models.DateTimeField()
+    finish = models.DateTimeField()
+    name = models.CharField(max_length=255, null=True, blank=True)
+
+    appeared = models.BooleanField(default=False, help_text="Indicates whether the customer showed up for the meeting.")
+
+    @property
+    def identifier(self) -> str:
+        return extract_calendly_uuid(
+            pattern=RegexPatterns.CALENDLY_URI_PATTERN.value, string=extract_path_from_uri(uri=self.uri), group="event"
+        )
+
+    @property
+    def fullname(self) -> str:
+        if self.firstname:
+            lastname = self.lastname or ""
+            return f"{self.firstname} {lastname}".strip()
+        return self.nickname
+
+    def __str__(self) -> str:
+        return f"Meeting #{self.pk} with {self.email}"
