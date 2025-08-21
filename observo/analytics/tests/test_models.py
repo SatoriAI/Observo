@@ -45,6 +45,7 @@ class TestContact(TestCase):
         self.assertEqual(str(contact), f"Contact #{contact.pk} left by {self.email}")
 
 
+@ddt
 class TestMeeting(TestCase):
     def setUp(self):
         self.email = fake.email()
@@ -65,3 +66,16 @@ class TestMeeting(TestCase):
         uuid = fake.uuid4()
         meeting = MeetingFactory(uri=f"https://api.calendly.com/scheduled_events/{uuid}")
         self.assertEqual(meeting.identifier, uuid)
+
+    @unpack
+    @data(
+        ({"nickname": "Username"}, "Username"),
+        ({"firstname": "Firstname"}, "Firstname"),
+        ({"firstname": "Firstname", "lastname": "Lastname"}, "Firstname Lastname"),
+        ({"nickname": "Username", "lastname": "Lastname"}, "Username"),
+        ({"lastname": "Lastname"}, None),
+        ({}, None),
+    )
+    def test_fullname(self, parameters: dict, expected: str | None) -> None:
+        meeting = MeetingFactory(**parameters)
+        self.assertEqual(meeting.fullname, expected)

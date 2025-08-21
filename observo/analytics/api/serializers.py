@@ -107,3 +107,8 @@ class SurveySerializer(serializers.ModelSerializer):
         )
 
         return obj
+
+
+class AvailableDataSerializer(serializers.Serializer):
+    sectors = serializers.ListField(child=serializers.CharField(), allow_empty=True)
+    locales = serializers.ListField(child=serializers.CharField(), allow_empty=True)
