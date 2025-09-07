@@ -106,7 +106,6 @@ class ContactAdmin(ModelAdmin):
     ordering = ("-created_at",)
 
     readonly_fields = (
-        "survey",
         "created_at",
         "updated_at",
     )
