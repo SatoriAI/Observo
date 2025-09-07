@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Order Processing Notification</title>
+        <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-weight: normal;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 80%;
+            margin: auto;
+        }
+
+        header {
+            font-size: 16px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        header, .signature {
+            margin: 0;
+        }
+
+        .signature {
+            padding-top: 2%;
+            font-size: 14px;
+            color: #4a4a4a;
+        }
+
+        table {
+            width: 90%;
+            margin: 6% auto 8%;
+            border-collapse: collapse;
+        }
+        thead {
+            background-color: #fafafa;
+        }
+        th, td {
+            padding: 2.5%;
+            text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .highlight {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .block {
+            margin-top: 2%;
+            margin-bottom: 6%;
+        }
+
+        blockquote {
+            background: #f2f2f2;
+            margin: 0;
+            padding: 3%;
+            color: #555;
+            border-left: 4px solid #ccc;
+        }
+
+        footer {
+            background: #fafafa;
+            padding: 2%;
+            color: #999;
+            text-align: center;
+            border-top: 1px solid #e8e8e8;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                {% if user.first_name %}
+                    <p>Dear {{ user.first_name }}!</p>
+                {% else %}
+                    <p>Dear {{ user.username }}!</p>
+                {% endif %}
+            </header>
+            <main>
+                {% block content %}{% endblock %}
+            </main>
+            <div>
+                <p>If you have any questions or need further assistance, feel free to reach out to me.</p>
+            </div>
+            <div class="signature">
+                <p>Regards!</p>
+                <p>
+                    Dawid
+                    <br>
+                    OpenGrant
+                </p>
+            </div>
+            <footer>
+                <p>&copy; {% now "Y" %} OpenGrant. All rights reserved.</p>
+            </footer>
+        </div>
+    </body>
+</html>
