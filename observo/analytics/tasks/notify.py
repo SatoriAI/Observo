@@ -1,4 +1,5 @@
 import logging
+import time
 
 from celery import shared_task
 
@@ -13,11 +14,37 @@ def notify_contact(contact_id: int) -> None:
     logger.info(f"Starting notify_contact task for contact_id: {contact_id}")
 
     try:
-        # Retrieve contact with extended logging
-        contact = Contact.objects.get(id=contact_id)
-        logger.info(
-            f"Retrieved contact - ID: {contact.id}, Email: {contact.email}, Name: {getattr(contact, 'name', 'N/A')}"
-        )
+        # Retrieve contact with retry logic for Railway startup issues
+        contact = None
+        retry_delays = [2, 4, 8, 16, 32]  # Exponential backoff in seconds
+
+        for attempt in range(len(retry_delays) + 1):
+            try:
+                contact = Contact.objects.get(id=contact_id)
+                logger.info(
+                    f"Retrieved contact on attempt {attempt + 1} - ID: {contact.id}, Email: {contact.email}, Name: {getattr(contact, 'name', 'N/A')}"
+                )
+                break  # Success, exit retry loop
+            except Contact.DoesNotExist:
+                if attempt < len(retry_delays):
+                    delay = retry_delays[attempt]
+                    logger.warning(f"Contact {contact_id} not found on attempt {attempt + 1}, retrying in {delay} seconds...")
+                    time.sleep(delay)
+                else:
+                    # This was the last attempt, re-raise the exception
+                    raise
+            except Exception as e:
+                if attempt < len(retry_delays):
+                    delay = retry_delays[attempt]
+                    logger.warning(f"Error retrieving contact {contact_id} on attempt {attempt + 1}: {str(e)}, retrying in {delay} seconds...")
+                    time.sleep(delay)
+                else:
+                    # This was the last attempt, re-raise the exception
+                    raise
+
+        # If we get here without a contact, something went wrong with the retry logic
+        if contact is None:
+            raise Contact.DoesNotExist(f"Failed to retrieve contact {contact_id} after all retry attempts")
 
         # Log email preparation details
         recipients = [contact.email]
