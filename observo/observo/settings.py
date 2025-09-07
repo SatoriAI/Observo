@@ -21,6 +21,8 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
     CORS_ALLOWED_ORIGINS=(list, []),
     CSRF_TRUSTED_ORIGINS=(list, []),
+    CELERY_BROKER_URL=(str, "redis://localhost:6379/0"),
+    CELERY_RESULT_BACKEND=(str, "redis://localhost:6379/0"),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -189,3 +191,11 @@ IP_SALT = env("IP_SALT")
 CALENDLY_KEY = env("CALENDLY_KEY")
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+
+# Celery Configuration
+CELERY_BROKER_URL = env("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+CELERY_WORKER_DISABLE_RATE_LIMITS = True

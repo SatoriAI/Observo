@@ -1,0 +1,11 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "./Dockerfile"
+
+[deploy]
+startCommand = """
+    sh -c '
+        cd observo &&
+        uv run --no-sync --no-dev celery -A observo worker --loglevel=info --concurrency=2
+    '
+"""
