@@ -19,7 +19,3 @@ RUN uv sync --frozen --no-dev
 
 # Copy source code for Konfio
 COPY observo/ ./observo/
-
-# Probe /healtcheck every 30s, time out after 5s, start probing 10s after boot, retry 3x
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-    CMD curl -f http://localhost:8000/healthcheck/ || exit 1

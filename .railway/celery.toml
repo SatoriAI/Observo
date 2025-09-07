@@ -6,6 +6,6 @@ dockerfilePath = "./Dockerfile"
 startCommand = """
     sh -c '
         cd observo &&
-        uv run --no-sync --no-dev celery -A observo worker --loglevel=info --concurrency=2
+        uv run --no-sync --no-dev celery -A observo.celery worker --loglevel=info --concurrency 2
     '
 """

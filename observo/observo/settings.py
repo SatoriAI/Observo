@@ -193,8 +193,12 @@ EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 
 # Celery Configuration
-CELERY_BROKER_URL = env("CELERY_BROKER_URL")
+# Prefer explicit CELERY_* vars, but fall back to Railway's REDIS_URL if present
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default=env("CELERY_BROKER_URL"))
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default=env("CELERY_BROKER_URL"))
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
 CELERY_WORKER_DISABLE_RATE_LIMITS = True
+# Ensure the worker retries connecting to broker at startup (useful on orchestrators)
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
