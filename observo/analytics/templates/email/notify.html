@@ -17,10 +17,6 @@
             margin: auto;
         }
 
-        header {
-            font-size: 16px;
-        }
-
         header, .signature {
             margin: 0;
         }
@@ -67,7 +63,7 @@
     <body>
         <div class="container">
             <header>
-                <p>Good morning,</p>
+                <p>{{ greeting|default:"Good morning," }}</p>
             </header>
             <main>
                 <p>Thanks for reaching out through our website! At OpenGrant, we help entrepreneurs win R&D grants ($250,000 - $1,400,000) at a 3x higher success rate than industry standard.</p>

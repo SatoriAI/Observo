@@ -4,6 +4,7 @@ import time
 from celery import shared_task
 
 from analytics.models import Contact
+from utils.functions import get_time_based_greeting
 from utils.mailer import send_email
 
 logger = logging.getLogger(__name__)
@@ -53,14 +54,17 @@ def notify_contact(contact_id: int) -> None:
             f"Preparing to send email - Recipients: {recipients}, CC: {cc_list}, Subject: '[OpenGrant] Schedule your grant strategy call'"
         )
 
+        # Generate time-based greeting based on user's locale
+        greeting = get_time_based_greeting(locale=contact.survey.locale)
+
         # Send the email
-        logger.info(f"Sending notification email to contact {contact_id}")
+        logger.info(f"Sending notification email to contact {contact_id} with greeting: '{greeting}'")
         send_email(
             subject="[OpenGrant] Schedule your grant strategy call",
             recipients=recipients,
             cc=cc_list,
             template="email/notify.html",
-            context={"contact": contact},
+            context={"contact": contact, "greeting": greeting},
         )
         logger.info(f"Email sent successfully to contact {contact_id} ({contact.email})")
 
