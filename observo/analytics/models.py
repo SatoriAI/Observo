@@ -3,7 +3,7 @@ from django.db import models
 from analytics.enums import PossibleAnswers
 from utils.config import RegexPatterns
 from utils.functions import extract_calendly_uuid, extract_path_from_uri
-
+from analytics.tasks import notify_contact
 
 class TimestampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
@@ -46,6 +46,16 @@ class Contact(TimestampedModel):
 
     def __str__(self) -> str:
         return f"Contact #{self.pk} left by {self.email}"
+
+    def notify(self) -> None:
+        if not self.notified:
+            notify_contact.delay(self.id)
+            self.notified = True
+            self.save()
+
+    def save(self, *args, **kwargs) -> None:
+        self.notify()
+        super().save(*args, **kwargs)
 
 
 class Meeting(TimestampedModel):

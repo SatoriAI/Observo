@@ -7,8 +7,6 @@ from utils.mailer import send_email
 @shared_task(name="notify_contact")
 def notify_contact(contact_id: int) -> None:
     contact = Contact.objects.get(id=contact_id)
-    contact.notified = True
-    contact.save()
 
     send_email(
         subject="[OpenGrant] Schedule your grant strategy call",
