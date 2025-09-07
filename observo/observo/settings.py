@@ -193,12 +193,17 @@ CALENDLY_KEY = env("CALENDLY_KEY")
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 
-# Email Configuration
+# HTTP email provider (Resend) and email defaults
+RESEND_API_KEY = env("RESEND_API_KEY", default=None)
+EMAIL_FROM = env("EMAIL_FROM", default=EMAIL_HOST_USER)
+EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=10)
+
+# Email Configuration (SMTP fallback)
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
-EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")  # Default to Gmail, change as needed
-EMAIL_PORT = env("EMAIL_PORT", default=587)  # Default to TLS port
-EMAIL_USE_TLS = env("EMAIL_USE_TLS", default=True)  # Use TLS by default
-EMAIL_USE_SSL = env("EMAIL_USE_SSL", default=False)  # Don't use SSL if TLS is used
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = env("EMAIL_PORT", default=587)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
 
 # Celery Configuration
 # Prefer explicit CELERY_* vars, but fall back to Railway's REDIS_URL if present
