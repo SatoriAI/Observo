@@ -1,6 +1,7 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin, StackedInline
 
+from analytics.actions.notify import notify_selected_contacts
 from analytics.models import Contact, Meeting, Survey
 
 
@@ -80,3 +81,53 @@ class SurveyAdmin(ModelAdmin):
     @admin.display(description="B/total")
     def b_progress(self, obj: Survey) -> str:
         return f"{obj.b_count}/{obj.total_questions}"
+
+
+@admin.register(Contact)
+class ContactAdmin(ModelAdmin):
+    actions = [notify_selected_contacts]
+
+    list_display = (
+        "email",
+        "survey",
+        "notified",
+        "created_at",
+        "survey_b_progress",
+        "survey_sector",
+    )
+    list_filter = (
+        "notified",
+        "created_at",
+        "survey__sector",
+        "survey__locale",
+    )
+    search_fields = (
+        "email",
+        "description",
+        "survey__sector",
+    )
+    ordering = ("-created_at",)
+
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+    )
+
+    fieldsets = (
+        ("Contact Information", {"fields": ("email", "description", "notified")}),
+        (
+            "Related Survey",
+            {
+                "fields": ("survey",),
+            },
+        ),
+        ("Timestamps", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
+    )
+
+    @admin.display(description="Survey Progress")
+    def survey_b_progress(self, obj: Contact) -> str:
+        return f"{obj.survey.b_count}/{obj.survey.total_questions}"
+
+    @admin.display(description="Survey Sector")
+    def survey_sector(self, obj: Contact) -> str:
+        return obj.survey.sector or "N/A"

@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -21,6 +22,8 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
     CORS_ALLOWED_ORIGINS=(list, []),
     CSRF_TRUSTED_ORIGINS=(list, []),
+    CELERY_BROKER_URL=(str, "redis://localhost:6379/0"),
+    CELERY_RESULT_BACKEND=(str, "redis://localhost:6379/0"),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -91,7 +94,7 @@ ROOT_URLCONF = "observo.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -187,3 +190,28 @@ REST_FRAMEWORK = {
 # Own Environmental Variables
 IP_SALT = env("IP_SALT")
 CALENDLY_KEY = env("CALENDLY_KEY")
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+
+# HTTP email provider (Resend) and email defaults
+RESEND_API_KEY = env("RESEND_API_KEY", default=None)
+EMAIL_FROM = env("EMAIL_FROM", default=EMAIL_HOST_USER)
+EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=10)
+
+# Email Configuration (SMTP fallback)
+EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = env("EMAIL_PORT", default=587)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+
+# Celery Configuration
+# Prefer explicit CELERY_* vars, but fall back to Railway's REDIS_URL if present
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default=env("CELERY_BROKER_URL"))
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default=env("CELERY_BROKER_URL"))
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+CELERY_WORKER_DISABLE_RATE_LIMITS = True
+# Ensure the worker retries connecting to broker at startup (useful on orchestrators)
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Order Processing Notification</title>
+        <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-weight: normal;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 80%;
+            margin: auto;
+        }
+
+        header, .signature {
+            margin: 0;
+        }
+
+        .signature {
+            padding-top: 2%;
+            font-size: 14px;
+            color: #4a4a4a;
+        }
+
+        a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .cta-button {
+            display: block;
+            background-color: #1a73e8;
+            color: white !important;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px auto;
+            width: fit-content;
+            box-shadow: 0 2px 4px rgba(26, 115, 232, 0.2);
+        }
+
+        .cta-button:hover {
+            background-color: #1557b0;
+            box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+        }
+
+        footer {
+            background: #fafafa;
+            padding: 2%;
+            color: #999;
+            text-align: center;
+            border-top: 1px solid #e8e8e8;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <p>Hello!</p>
+            </header>
+            <main>
+                <p>Thanks for reaching out through our website! At OpenGrant, we help entrepreneurs win R&D grants ($250,000 - $1,400,000) at a 3x higher success rate than industry standard.</p>
+
+                <p>Here's how we can help:</p>
+                <ul>
+                    <li>Identify the right grant opportunities for your project.</li>
+                    <li>Write and submit your Project white paper (10 pages of R&D plans).</li>
+                    <li>Prepare and submit the Full Proposal (50–60 pages) and handle all compliance requirements.</li>
+                    <li>Provide a designated grant expert to guide you through the entire process until you receive the funding (including resubmission support).</li>
+                </ul>
+
+                <p>All of this is covered by a one time retainer fee of $1049 and 3% success fee (only paid if we win the grant for you). No hidden costs.</p>
+
+                <p>How about a 20-minute meeting to discuss your Project specifics in one of these slots?</p>
+                <a href="https://calendly.com/opengrant/federal-grant-consult" class="cta-button">Schedule Your Free Consultation</a>
+            </main>
+            <div class="signature">
+                <p>Regards!</p>
+                <p>
+                    Dawid
+                    <br>
+                    OpenGrant
+                </p>
+            </div>
+            <footer>
+                <p>&copy; {% now "Y" %} <a href="https://open-grant.com" style="color: #1a73e8;">OpenGrant</a>. All rights reserved.</p>
+            </footer>
+        </div>
+    </body>
+</html>

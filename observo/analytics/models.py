@@ -42,6 +42,8 @@ class Contact(TimestampedModel):
     email = models.EmailField()
     description = models.TextField(null=True, blank=True)
 
+    notified = models.BooleanField(default=False, help_text="Indicates whether the contact has been notified.")
+
     def __str__(self) -> str:
         return f"Contact #{self.pk} left by {self.email}"
 

@@ -17,10 +17,13 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import RedirectView
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
+    # Admin panel under /admin/ and make the home page redirect to /admin/
     path("admin/", admin.site.urls),
+    path("", RedirectView.as_view(url="/admin/", permanent=False)),
     # Healthcheck
     path("healthcheck/", include("health_check.urls")),
     # API
