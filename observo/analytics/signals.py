@@ -8,4 +8,5 @@ from analytics.models import Contact
 def notify_contact_on_save(sender, instance, created, **kwargs):
     if created and not instance.notified:
         from analytics.tasks.notify import notify_contact
+
         notify_contact.delay(instance.id)
