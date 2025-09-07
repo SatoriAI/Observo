@@ -14,6 +14,6 @@ def notify_contact(contact_id: int) -> None:
         subject="[OpenGrant] Schedule your grant strategy call",
         recipients=[contact.email],
         cc=["casper@open-grant.com"],
-        template="templates/email/notify.html",
+        template="email/notify.html",
         context={"contact": contact},
     )
