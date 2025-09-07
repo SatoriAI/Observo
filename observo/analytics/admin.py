@@ -1,6 +1,7 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin, StackedInline
 
+from analytics.actions.notify import notify_selected_contacts
 from analytics.models import Contact, Meeting, Survey
 
 
@@ -84,6 +85,8 @@ class SurveyAdmin(ModelAdmin):
 
 @admin.register(Contact)
 class ContactAdmin(ModelAdmin):
+    actions = [notify_selected_contacts]
+
     list_display = (
         "email",
         "survey",

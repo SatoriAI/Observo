@@ -49,8 +49,13 @@ def get_time_based_greeting(locale: Optional[str] = None, timezone_offset: Optio
     if locale:
         locale_lower = locale.lower()
 
+        # English (including US)
+        if locale_lower.startswith('en'):
+            # US English uses the same greetings as default English
+            return f"{greeting_base},"
+
         # French
-        if locale_lower.startswith('fr'):
+        elif locale_lower.startswith('fr'):
             if 5 <= local_hour < 12:
                 return "Bonjour"
             elif 12 <= local_hour < 17:
