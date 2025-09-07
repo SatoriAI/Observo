@@ -116,7 +116,6 @@ class ContactAdmin(ModelAdmin):
         }),
         ("Related Survey", {
             "fields": ("survey",),
-            "classes": ("collapse",)
         }),
         ("Timestamps", {
             "fields": ("created_at", "updated_at"),
