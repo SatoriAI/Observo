@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-import os 
+import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -192,6 +192,13 @@ IP_SALT = env("IP_SALT")
 CALENDLY_KEY = env("CALENDLY_KEY")
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+
+# Email Configuration
+EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")  # Default to Gmail, change as needed
+EMAIL_PORT = env("EMAIL_PORT", default=587)  # Default to TLS port
+EMAIL_USE_TLS = env("EMAIL_USE_TLS", default=True)  # Use TLS by default
+EMAIL_USE_SSL = env("EMAIL_USE_SSL", default=False)  # Don't use SSL if TLS is used
 
 # Celery Configuration
 # Prefer explicit CELERY_* vars, but fall back to Railway's REDIS_URL if present

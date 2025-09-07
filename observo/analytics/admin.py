@@ -111,16 +111,14 @@ class ContactAdmin(ModelAdmin):
     )
 
     fieldsets = (
-        ("Contact Information", {
-            "fields": ("email", "description", "notified")
-        }),
-        ("Related Survey", {
-            "fields": ("survey",),
-        }),
-        ("Timestamps", {
-            "fields": ("created_at", "updated_at"),
-            "classes": ("collapse",)
-        }),
+        ("Contact Information", {"fields": ("email", "description", "notified")}),
+        (
+            "Related Survey",
+            {
+                "fields": ("survey",),
+            },
+        ),
+        ("Timestamps", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
     )
 
     @admin.display(description="Survey Progress")
