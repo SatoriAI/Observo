@@ -65,8 +65,6 @@ class SurveySerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = (
             "id",
-            "total_questions",
-            "b_count",
             "created_at",
             "updated_at",
         )
@@ -99,8 +97,9 @@ class SurveySerializer(serializers.ModelSerializer):
         obj = Survey.objects.create(
             answers=validated_data["answers"],
             sector=validated_data.get("sector"),
+            website=validated_data.get("website"),
+            eager_to_pay=False if validated_data.get("eager_to_pay") == PossibleAnswers.ANSWER_A else True,
             locale=validated_data.get("locale"),
-            threshold=validated_data.get("threshold"),
             user_agent=user_agent,
             referrer=referrer,
             client_ip_hash=hash_ip(client_ip),

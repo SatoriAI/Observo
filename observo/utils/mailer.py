@@ -1,8 +1,7 @@
-from typing import Any
-
 import json
 import logging
 from dataclasses import dataclass
+from typing import Any
 
 import requests
 from django.core.mail import EmailMultiAlternatives
@@ -26,7 +25,7 @@ def _send_via_smtp(subject: str, html_content: str, recipients: list[str], cc: l
     )
     email.attach_alternative(html_content, "text/html")
     sent = email.send()
-    return MailSendResult(success=bool(sent), provider="smtp", message="SMTP send returned %s" % sent)
+    return MailSendResult(success=bool(sent), provider="smtp", message=f"SMTP send returned {sent}")
 
 
 def _send_via_resend(subject: str, html_content: str, recipients: list[str], cc: list[str] | None) -> MailSendResult:

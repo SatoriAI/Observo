@@ -29,7 +29,9 @@ def notify_contact(contact_id: int) -> None:
             except Contact.DoesNotExist:
                 if attempt < len(retry_delays):
                     delay = retry_delays[attempt]
-                    logger.warning(f"Contact {contact_id} not found on attempt {attempt + 1}, retrying in {delay} seconds...")
+                    logger.warning(
+                        f"Contact {contact_id} not found on attempt {attempt + 1}, retrying in {delay} seconds..."
+                    )
                     time.sleep(delay)
                 else:
                     # This was the last attempt, re-raise the exception
@@ -37,7 +39,9 @@ def notify_contact(contact_id: int) -> None:
             except Exception as e:
                 if attempt < len(retry_delays):
                     delay = retry_delays[attempt]
-                    logger.warning(f"Error retrieving contact {contact_id} on attempt {attempt + 1}: {str(e)}, retrying in {delay} seconds...")
+                    logger.warning(
+                        f"Error retrieving contact {contact_id} on attempt {attempt + 1}: {str(e)}, retrying in {delay} seconds..."
+                    )
                     time.sleep(delay)
                 else:
                     # This was the last attempt, re-raise the exception

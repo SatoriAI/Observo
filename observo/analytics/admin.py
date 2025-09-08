@@ -48,8 +48,7 @@ class SurveyAdmin(ModelAdmin):
         "created_at",
         "sector",
         "locale",
-        "b_progress",
-        "threshold",
+        "eager_to_pay",
     )
     list_filter = (
         "sector",
@@ -61,15 +60,23 @@ class SurveyAdmin(ModelAdmin):
 
     # Unfold will pretty-format JSON when it's readonly (optionally with Pygments)
     readonly_fields = (
+        "eager_to_pay",
+        "website",
         "sector",
         "answers",
-        "threshold",
         "locale",
         "user_agent",
         "referrer",
         "client_ip_hash",
         "created_at",
+        "updated_at",
     )
+
+    fieldsets = [
+        ("Servey", {"fields": ("eager_to_pay", "website", "sector", "answers")}),
+        ("User Data", {"fields": ("locale", "user_agent", "referrer", "client_ip_hash")}),
+        ("Timestamps", {"fields": ("created_at", "updated_at")}),
+    ]
 
     inlines = (
         ContactInline,
@@ -77,10 +84,6 @@ class SurveyAdmin(ModelAdmin):
     )
 
     compressed_fields = True  # Compact long forms
-
-    @admin.display(description="B/total")
-    def b_progress(self, obj: Survey) -> str:
-        return f"{obj.b_count}/{obj.total_questions}"
 
 
 @admin.register(Contact)
@@ -92,14 +95,11 @@ class ContactAdmin(ModelAdmin):
         "survey",
         "notified",
         "created_at",
-        "survey_b_progress",
-        "survey_sector",
     )
     list_filter = (
         "notified",
         "created_at",
         "survey__sector",
-        "survey__locale",
     )
     search_fields = (
         "email",
@@ -115,18 +115,9 @@ class ContactAdmin(ModelAdmin):
 
     fieldsets = (
         ("Contact Information", {"fields": ("email", "description", "notified")}),
-        (
-            "Related Survey",
-            {
-                "fields": ("survey",),
-            },
-        ),
+        ("Related Survey", {"fields": ("survey",)}),
         ("Timestamps", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
     )
-
-    @admin.display(description="Survey Progress")
-    def survey_b_progress(self, obj: Contact) -> str:
-        return f"{obj.survey.b_count}/{obj.survey.total_questions}"
 
     @admin.display(description="Survey Sector")
     def survey_sector(self, obj: Contact) -> str:

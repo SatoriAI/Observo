@@ -1,6 +1,5 @@
 import re
 from datetime import datetime
-from typing import Optional
 from urllib.parse import urlparse
 
 
@@ -15,7 +14,7 @@ def extract_calendly_uuid(pattern: re.Pattern, string: str, group: str | int) ->
     return m.group(group)
 
 
-def get_time_based_greeting(locale: Optional[str] = None, timezone_offset: Optional[int] = None) -> str:
+def get_time_based_greeting(locale: str | None = None, timezone_offset: int | None = None) -> str:
     """
     Returns a time-based greeting based on the user's locale and timezone.
 
@@ -50,12 +49,12 @@ def get_time_based_greeting(locale: Optional[str] = None, timezone_offset: Optio
         locale_lower = locale.lower()
 
         # English (including US)
-        if locale_lower.startswith('en'):
+        if locale_lower.startswith("en"):
             # US English uses the same greetings as default English
             return f"{greeting_base},"
 
         # French
-        elif locale_lower.startswith('fr'):
+        elif locale_lower.startswith("fr"):
             if 5 <= local_hour < 12:
                 return "Bonjour"
             elif 12 <= local_hour < 17:
@@ -64,7 +63,7 @@ def get_time_based_greeting(locale: Optional[str] = None, timezone_offset: Optio
                 return "Bonsoir"
 
         # Spanish
-        elif locale_lower.startswith('es'):
+        elif locale_lower.startswith("es"):
             if 5 <= local_hour < 12:
                 return "Buenos días"
             elif 12 <= local_hour < 17:
@@ -73,7 +72,7 @@ def get_time_based_greeting(locale: Optional[str] = None, timezone_offset: Optio
                 return "Buenas noches"
 
         # German
-        elif locale_lower.startswith('de'):
+        elif locale_lower.startswith("de"):
             if 5 <= local_hour < 12:
                 return "Guten Morgen"
             elif 12 <= local_hour < 17:
@@ -82,7 +81,7 @@ def get_time_based_greeting(locale: Optional[str] = None, timezone_offset: Optio
                 return "Guten Abend"
 
         # Italian
-        elif locale_lower.startswith('it'):
+        elif locale_lower.startswith("it"):
             if 5 <= local_hour < 12:
                 return "Buongiorno"
             elif 12 <= local_hour < 17:
@@ -91,7 +90,7 @@ def get_time_based_greeting(locale: Optional[str] = None, timezone_offset: Optio
                 return "Buonasera"
 
         # Portuguese
-        elif locale_lower.startswith('pt'):
+        elif locale_lower.startswith("pt"):
             if 5 <= local_hour < 12:
                 return "Bom dia"
             elif 12 <= local_hour < 17:
@@ -100,7 +99,7 @@ def get_time_based_greeting(locale: Optional[str] = None, timezone_offset: Optio
                 return "Boa noite"
 
         # Dutch
-        elif locale_lower.startswith('nl'):
+        elif locale_lower.startswith("nl"):
             if 5 <= local_hour < 12:
                 return "Goedemorgen"
             elif 12 <= local_hour < 17:
@@ -109,7 +108,7 @@ def get_time_based_greeting(locale: Optional[str] = None, timezone_offset: Optio
                 return "Goedenavond"
 
         # Swedish
-        elif locale_lower.startswith('sv'):
+        elif locale_lower.startswith("sv"):
             if 5 <= local_hour < 12:
                 return "God morgon"
             elif 12 <= local_hour < 17:
@@ -118,7 +117,7 @@ def get_time_based_greeting(locale: Optional[str] = None, timezone_offset: Optio
                 return "God kväll"
 
         # Norwegian
-        elif locale_lower.startswith('no') or locale_lower.startswith('nb'):
+        elif locale_lower.startswith("no") or locale_lower.startswith("nb"):
             if 5 <= local_hour < 12:
                 return "God morgen"
             elif 12 <= local_hour < 17:
@@ -127,7 +126,7 @@ def get_time_based_greeting(locale: Optional[str] = None, timezone_offset: Optio
                 return "God kveld"
 
         # Danish
-        elif locale_lower.startswith('da'):
+        elif locale_lower.startswith("da"):
             if 5 <= local_hour < 12:
                 return "God morgen"
             elif 12 <= local_hour < 17:
@@ -136,7 +135,7 @@ def get_time_based_greeting(locale: Optional[str] = None, timezone_offset: Optio
                 return "God aften"
 
         # Polish
-        elif locale_lower.startswith('pl'):
+        elif locale_lower.startswith("pl"):
             if 5 <= local_hour < 12:
                 return "Dzień dobry"
             elif 12 <= local_hour < 17:
@@ -145,7 +144,7 @@ def get_time_based_greeting(locale: Optional[str] = None, timezone_offset: Optio
                 return "Dobry wieczór"
 
         # Russian
-        elif locale_lower.startswith('ru'):
+        elif locale_lower.startswith("ru"):
             if 5 <= local_hour < 12:
                 return "Доброе утро"
             elif 12 <= local_hour < 17:
