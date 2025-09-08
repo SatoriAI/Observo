@@ -96,8 +96,6 @@ class SurveySerializer(serializers.ModelSerializer):
         referrer = request.META.get("HTTP_REFERER")
         client_ip = request.META.get("REMOTE_ADDR") or request.META.get("HTTP_X_FORWARDED_FOR").split(",")[0].strip()
 
-        breakpoint()
-
         obj = Survey.objects.create(
             answers=validated_data["answers"],
             sector=validated_data.get("sector"),
