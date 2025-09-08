@@ -4,6 +4,7 @@ import time
 from celery import shared_task
 
 from analytics.models import Contact
+from utils.functions import compute_greetings
 from utils.mailer import send_email
 
 logger = logging.getLogger(__name__)
@@ -50,6 +51,12 @@ def notify_contact(contact_id: int) -> None:
         if contact is None:
             raise Contact.DoesNotExist(f"Failed to retrieve contact {contact_id} after all retry attempts")
 
+        survey = contact.survey
+        if not survey.coordinates:
+            greeting = "Hello"
+        else:
+            greeting = compute_greetings(*survey.coordinates)
+
         # Log email preparation details
         recipients = [contact.email]
         cc_list = ["casper@open-grant.com"]
@@ -64,7 +71,7 @@ def notify_contact(contact_id: int) -> None:
             recipients=recipients,
             cc=cc_list,
             template="email/notify.html",
-            context={"contact": contact},
+            context={"contact": contact, "greeting": greeting},
         )
         logger.info(f"Email sent successfully to contact {contact_id} ({contact.email})")
 

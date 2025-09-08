@@ -13,16 +13,25 @@ class TimestampedModel(models.Model):
 
 
 class Survey(TimestampedModel):
+    # Survey Data
     answers = models.JSONField(default=dict)
     sector = models.CharField(max_length=160, null=True, blank=True)
     website = models.URLField(null=True, blank=True)
     eager_to_pay = models.BooleanField(default=False, verbose_name="Eager To Pay")
 
+    # Request Data
     locale = models.CharField(max_length=10, null=True, blank=True)
-    geo_location = models.CharField(max_length=255, null=True, blank=True)
-    user_agent = models.TextField(null=True, blank=True)
+    geolocation = models.CharField(max_length=255, null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True, verbose_name="User Agent")
     referrer = models.URLField(null=True, blank=True)
     client_ip_hash = models.CharField(max_length=128, null=True, blank=True, verbose_name="Hashed Client's IP")
+
+    @property
+    def coordinates(self) -> tuple[float, float] | None:
+        if not self.geolocation:
+            return None
+        latitude, longitude = self.geolocation.split(";")
+        return latitude, longitude
 
     def __str__(self) -> str:
         return f"Survey #{self.pk}"

@@ -102,6 +102,7 @@ class SurveySerializer(serializers.ModelSerializer):
             website=validated_data.get("website"),
             eager_to_pay=False if validated_data.get("cost") == PossibleAnswers.ANSWER_A else True,
             locale=validated_data.get("locale"),
+            geolocation=validated_data.get("geolocation"),
             user_agent=user_agent,
             referrer=referrer,
             client_ip_hash=hash_ip(client_ip),
