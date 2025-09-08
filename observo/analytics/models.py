@@ -19,6 +19,7 @@ class Survey(TimestampedModel):
     eager_to_pay = models.BooleanField(default=False, verbose_name="Eager To Pay")
 
     locale = models.CharField(max_length=10, null=True, blank=True)
+    geo_location = models.CharField(max_length=255, null=True, blank=True)
     user_agent = models.TextField(null=True, blank=True)
     referrer = models.URLField(null=True, blank=True)
     client_ip_hash = models.CharField(max_length=128, null=True, blank=True, verbose_name="Hashed Client's IP")
