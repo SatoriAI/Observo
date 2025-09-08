@@ -133,6 +133,20 @@ class AnalyticsOverviewView(ListAPIView):
         for row in by_locale:
             row["conversion_rate"] = (row["with_meeting"] or 0) / row["surveys"] if row["surveys"] else 0
 
+        # Geolocation data
+        geolocation_data = []
+        for survey in qs.exclude(geolocation__isnull=True).exclude(geolocation=""):
+            coordinates = survey.coordinates
+            if coordinates:
+                try:
+                    latitude, longitude = coordinates
+                    geolocation_data.append({
+                        "latitude": float(latitude),
+                        "longitude": float(longitude),
+                    })
+                except (ValueError, TypeError):
+                    continue
+
         return Response(
             {
                 "filters": {
@@ -150,5 +164,6 @@ class AnalyticsOverviewView(ListAPIView):
                     "by_sector": list(by_sector),
                     "by_locale": list(by_locale),
                 },
+                "geolocation": geolocation_data,
             }
         )
