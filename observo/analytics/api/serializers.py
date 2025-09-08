@@ -60,6 +60,8 @@ class MeetingSerializer(serializers.ModelSerializer):
 
 
 class SurveySerializer(serializers.ModelSerializer):
+    cost = serializers.CharField(write_only=True)
+
     class Meta:
         model = Survey
         fields = "__all__"
@@ -94,11 +96,13 @@ class SurveySerializer(serializers.ModelSerializer):
         referrer = request.META.get("HTTP_REFERER")
         client_ip = request.META.get("REMOTE_ADDR") or request.META.get("HTTP_X_FORWARDED_FOR").split(",")[0].strip()
 
+        breakpoint()
+
         obj = Survey.objects.create(
             answers=validated_data["answers"],
             sector=validated_data.get("sector"),
             website=validated_data.get("website"),
-            eager_to_pay=False if validated_data.get("eager_to_pay") == PossibleAnswers.ANSWER_A else True,
+            eager_to_pay=False if validated_data.get("cost") == PossibleAnswers.ANSWER_A else True,
             locale=validated_data.get("locale"),
             user_agent=user_agent,
             referrer=referrer,
