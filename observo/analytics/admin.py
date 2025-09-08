@@ -49,32 +49,37 @@ class SurveyAdmin(ModelAdmin):
         "sector",
         "locale",
         "eager_to_pay",
+        "has_meeting",
+        "has_contact",
     )
     list_filter = (
         "sector",
         "locale",
-        "created_at",
     )
     search_fields = ("sector",)
     ordering = ("-created_at",)
 
     # Unfold will pretty-format JSON when it's readonly (optionally with Pygments)
     readonly_fields = (
+        # Survey
         "eager_to_pay",
         "website",
         "sector",
         "answers",
+        # Request
         "locale",
+        "geolocation",
         "user_agent",
         "referrer",
         "client_ip_hash",
+        # Time
         "created_at",
         "updated_at",
     )
 
     fieldsets = [
         ("Servey", {"fields": ("eager_to_pay", "website", "sector", "answers")}),
-        ("User Data", {"fields": ("locale", "user_agent", "referrer", "client_ip_hash")}),
+        ("Request Info", {"fields": ("locale", "geolocation", "user_agent", "referrer", "client_ip_hash")}),
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
     ]
 
@@ -82,6 +87,18 @@ class SurveyAdmin(ModelAdmin):
         ContactInline,
         MeetingInline,
     )
+
+    @admin.display(description="Meeting Scheduled")
+    def has_meeting(self, obj: Survey) -> bool:
+        if hasattr(obj, "meeting"):
+            return True
+        return False
+
+    @admin.display(description="Contact Left")
+    def has_contact(self, obj: Contact) -> bool:
+        if hasattr(obj, "contact"):
+            return True
+        return False
 
     compressed_fields = True  # Compact long forms
 
