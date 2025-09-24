@@ -140,10 +140,12 @@ class AnalyticsOverviewView(ListAPIView):
             if coordinates:
                 try:
                     latitude, longitude = coordinates
-                    geolocation_data.append({
-                        "latitude": float(latitude),
-                        "longitude": float(longitude),
-                    })
+                    geolocation_data.append(
+                        {
+                            "latitude": float(latitude),
+                            "longitude": float(longitude),
+                        }
+                    )
                 except (ValueError, TypeError):
                     continue
 

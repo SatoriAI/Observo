@@ -29,6 +29,9 @@ env = environ.Env(
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Shell
+SHELL_PLUS = "ipython"
+
 # Load .env only if it exists (local dev); in Railway the vars come from the platform
 env_file = BASE_DIR.parent / ".env"
 if env_file.exists():
@@ -74,6 +77,8 @@ INSTALLED_APPS = [
     # Own Apps
     "analytics",
     "observo",
+    "opportunity",
+    "search",
     "utils",
 ]
 
@@ -115,6 +120,7 @@ WSGI_APPLICATION = "observo.wsgi.application"
 DATABASES = {
     "default": env.db(),
 }
+DATABASE_URL = env("DATABASE_URL")
 
 
 # Password validation
@@ -204,6 +210,9 @@ EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
 EMAIL_PORT = env("EMAIL_PORT", default=587)
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+
+# LLM
+GEMINI_API_KEY = env("GEMINI_API_KEY", default=None)
 
 # Celery Configuration
 # Prefer explicit CELERY_* vars, but fall back to Railway's REDIS_URL if present

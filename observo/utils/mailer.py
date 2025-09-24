@@ -6,6 +6,7 @@ from typing import Any
 import requests
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from rest_framework import status
 
 from observo import settings
 
@@ -55,7 +56,7 @@ def _send_via_resend(subject: str, html_content: str, recipients: list[str], cc:
     except requests.RequestException as exc:
         return MailSendResult(success=False, provider="resend", message=f"HTTP error: {exc}")
 
-    if resp.status_code >= 200 and resp.status_code < 300:
+    if status.HTTP_200_OK <= resp.status_code < status.HTTP_300_MULTIPLE_CHOICES:
         return MailSendResult(success=True, provider="resend", message="Resend accepted message")
     return MailSendResult(success=False, provider="resend", message=f"Resend error {resp.status_code}: {resp.text}")
 

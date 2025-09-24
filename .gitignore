@@ -1,3 +1,9 @@
+# MacOS
+.DS_Store
+
+# Own
+*.csv
+
 # PyCharm
 .idea/
 
