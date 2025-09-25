@@ -15,17 +15,17 @@ def notify_contact(contact_id: int) -> None:
     logger.info(f"Starting notify_contact task for contact_id: {contact_id}")
 
     try:
-        # Retrieve contact with retry logic for Railway startup issues
         contact = None
-        retry_delays = [2, 4, 8, 16, 32]  # Exponential backoff in seconds
+        retry_delays = [2, 4, 8, 16, 32]
 
         for attempt in range(len(retry_delays) + 1):
             try:
                 contact = Contact.objects.get(id=contact_id)
                 logger.info(
-                    f"Retrieved contact on attempt {attempt + 1} - ID: {contact.id}, Email: {contact.email}, Name: {getattr(contact, 'name', 'N/A')}"
+                    f"Retrieved contact on attempt {attempt + 1}. "
+                    f"ID: {contact.id}, Email: {contact.email}, Name: {getattr(contact, 'name', 'N/A')}"
                 )
-                break  # Success, exit retry loop
+                break
             except Contact.DoesNotExist:
                 if attempt < len(retry_delays):
                     delay = retry_delays[attempt]
@@ -34,20 +34,18 @@ def notify_contact(contact_id: int) -> None:
                     )
                     time.sleep(delay)
                 else:
-                    # This was the last attempt, re-raise the exception
                     raise
             except Exception as e:
                 if attempt < len(retry_delays):
                     delay = retry_delays[attempt]
                     logger.warning(
-                        f"Error retrieving contact {contact_id} on attempt {attempt + 1}: {str(e)}, retrying in {delay} seconds..."
+                        f"Error retrieving contact {contact_id} on attempt {attempt + 1}: {str(e)}. "
+                        f"Retrying in {delay} seconds..."
                     )
                     time.sleep(delay)
                 else:
-                    # This was the last attempt, re-raise the exception
                     raise
 
-        # If we get here without a contact, something went wrong with the retry logic
         if contact is None:
             raise Contact.DoesNotExist(f"Failed to retrieve contact {contact_id} after all retry attempts")
 
@@ -57,14 +55,13 @@ def notify_contact(contact_id: int) -> None:
         else:
             greeting = compute_greetings(*survey.coordinates)
 
-        # Log email preparation details
         recipients = [contact.email]
         cc_list = ["casper@open-grant.com"]
         logger.info(
-            f"Preparing to send email - Recipients: {recipients}, CC: {cc_list}, Subject: '[OpenGrant] Schedule your grant strategy call'"
+            f"Preparing to send email - Recipients: {recipients}, CC: {cc_list}. "
+            f"Subject: '[OpenGrant] Schedule your grant strategy call'"
         )
 
-        # Send the email
         logger.info(f"Sending notification email to contact {contact_id}")
         send_email(
             subject="[OpenGrant] Schedule your grant strategy call",
@@ -75,7 +72,6 @@ def notify_contact(contact_id: int) -> None:
         )
         logger.info(f"Email sent successfully to contact {contact_id} ({contact.email})")
 
-        # Update contact status
         contact.notified = True
         contact.save()
         logger.info(f"Contact {contact_id} marked as notified and saved successfully")

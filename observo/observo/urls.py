@@ -31,4 +31,5 @@ urlpatterns = [
     path("auth/refresh/", TokenRefreshView.as_view(), name="auth-refresh"),
     path("auth/logout/", TokenBlacklistView.as_view(), name="auth-logout"),
     path("api/", include("analytics.urls")),
+    path("api/", include("search.urls")),
 ]

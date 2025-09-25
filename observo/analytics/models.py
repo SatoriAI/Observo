@@ -2,14 +2,7 @@ from django.db import models
 
 from utils.config import RegexPatterns
 from utils.functions import extract_calendly_uuid, extract_path_from_uri
-
-
-class TimestampedModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
-
-    class Meta:
-        abstract = True
+from utils.models import TimestampedModel
 
 
 class Survey(TimestampedModel):
