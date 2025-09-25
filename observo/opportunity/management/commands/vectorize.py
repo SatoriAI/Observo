@@ -5,7 +5,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from tqdm import tqdm
 
 from opportunity.models import Opportunity
-from opportunity.vector_db import store
+from utils.vector_db import store
 
 
 class Command(BaseCommand):
@@ -20,7 +20,7 @@ class Command(BaseCommand):
         counter = 0
         documents = []
 
-        qs = Opportunity.objects.exclude(vectorized=True)
+        qs = Opportunity.objects.exclude(vectorized=True).order_by("title", "id").distinct("title")
 
         for opportunity in tqdm(qs.iterator(), total=qs.count(), unit="grant"):
             documents.append(Document(page_content=opportunity.describe(), metadata={"id": str(opportunity.id)}))
