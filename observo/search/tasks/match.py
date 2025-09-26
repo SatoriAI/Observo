@@ -23,8 +23,8 @@ def match_proposals(pk: int, summary: str) -> None:
                 "title": opportunity.title,
                 "max_funding": opportunity.funding,
                 "deadline": opportunity.closed.strftime("%Y/%m/%d") if opportunity.closed else None,
-                "applications": 10,
-                "success_rate": 10,
+                "applications": opportunity.applications,
+                "success_rate": opportunity.success_rate,
             }
         )
 
