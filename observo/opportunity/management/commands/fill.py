@@ -17,9 +17,9 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **options):
         queryset = Opportunity.objects.filter(Q(applications__isnull=True) | Q(success_rate__isnull=True))
-        self.stdout.write("%s Opportunities will be populated with `applications` and `success_rate`", queryset.count)
+        self.stdout.write(f"{queryset.count()} Opportunities will be populated with `applications` and `success_rate`")
 
-        iterator = queryset if options["no_progress"] else tqdm(queryset, total=len(queryset.count), unit="objects")
+        iterator = queryset if options["no_progress"] else tqdm(queryset, total=queryset.count(), unit="objects")
         for opportunity in iterator:
             applications = random.randint(a=10, b=25)
             success_rate = random.randint(a=3, b=5) / applications
