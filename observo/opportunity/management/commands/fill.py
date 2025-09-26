@@ -26,7 +26,7 @@ class Command(BaseCommand):
         iterator = queryset if options["no_progress"] else tqdm(queryset, total=queryset.count(), unit="objects")
         for opportunity in iterator:
             applications = random.randint(a=10, b=25)
-            success_rate = random.randint(a=3, b=5) / applications * 100  # Value as percentage, e.g. 20
+            success_rate = round(random.randint(a=3, b=5) / applications * 100, 2)  # Value as percentage, e.g. 20
             opportunity.applications = applications
             opportunity.success_rate = success_rate
             opportunity.save()
