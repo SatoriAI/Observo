@@ -17,6 +17,21 @@ class OpportunityAdmin(ModelAdmin):
         "title",
         "head",
     )
+    readonly_fields = (
+        "identifier",
+        "code",
+        "agency",
+        "head",
+        "funding",
+        "awards",
+        "opened",
+        "closed",
+        "archived",
+        "vectorized",
+        "source",
+        "created_at",
+        "updated_at",
+    )
 
     fieldsets = [
         ("Opportunity Info", {"fields": ("identifier", "code", "title")}),
