@@ -21,3 +21,4 @@ class Match(TimestampedModel):
 class Notification(TimestampedModel):
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     email = models.EmailField(verbose_name="Email")
+    notified = models.BooleanField(default=False)

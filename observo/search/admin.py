@@ -51,12 +51,15 @@ class MatchAdmin(ModelAdmin):
 class NotificationAdmin(ModelAdmin):
     list_display = (
         "email",
+        "notified",
         "created_at",
     )
+    list_filter = ("notified",)
     search_fields = ("email",)
     readonly_fields = ("created_at", "updated_at")
 
     fieldsets = [
         ("User Data", {"fields": ("email",)}),
+        ("System Info", {"fields": ("notified",)}),
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
     ]

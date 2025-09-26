@@ -30,18 +30,21 @@ class Opportunity(TimestampedModel):
 
     agency = models.CharField(max_length=255, verbose_name="Agency Name")
     head = models.CharField(max_length=255, verbose_name="Top Level Agency Name")
+
     categories = ArrayField(models.CharField(max_length=255), verbose_name="Categories", null=True, blank=True)
-
-    opened = models.DateTimeField(verbose_name="Opening Date")
-    closed = models.DateTimeField(verbose_name="Closing Date", null=True, blank=True)
-    instruction = models.TextField(verbose_name="Submission Instruction", null=True, blank=True)
-    archived = models.DateField(verbose_name="Archiving Date", null=True, blank=True)
-
     awards = models.PositiveSmallIntegerField(verbose_name="Number of Awards", null=True, blank=True)
     funding = models.PositiveBigIntegerField(verbose_name="Estimated Program Funding", null=True, blank=True)
 
-    eligibility = models.TextField(verbose_name="Applicant Eligibility Description", null=True, blank=True)
+    opened = models.DateTimeField(verbose_name="Opening Date")
+    closed = models.DateTimeField(verbose_name="Closing Date", null=True, blank=True)
+    archived = models.DateField(verbose_name="Archiving Date", null=True, blank=True)
+
     summary = models.TextField(verbose_name="Summary Description", null=True, blank=True)
+    eligibility = models.TextField(verbose_name="Applicant Eligibility Description", null=True, blank=True)
+    instruction = models.TextField(verbose_name="Submission Instruction", null=True, blank=True)
+
+    applications = models.PositiveSmallIntegerField(null=True, blank=True, help_text="Total applications submitted.")
+    success_rate = models.FloatField(null=True, blank=True, help_text="Success rate for applications.")
 
     vectorized = models.BooleanField(default=False)
     source = models.CharField(max_length=255, null=True, blank=True)

@@ -11,10 +11,19 @@ class OpportunityAdmin(ModelAdmin):
         "head",
         "funding",
         "vectorized",
-        "created_at",
     )
     list_filter = ("vectorized",)
     search_fields = (
         "title",
         "head",
     )
+
+    fieldsets = [
+        ("Opportunity Info", {"fields": ("identifier", "code", "title")}),
+        ("Institutes", {"fields": ("agency", "head")}),
+        ("Timeline", {"fields": ("categories", "funding", "awards")}),
+        ("Details", {"fields": ("opened", "closed", "archived")}),
+        ("Description", {"fields": ("summary", "eligibility", "instruction")}),
+        ("System Info", {"fields": ("applications", "success_rate", "vectorized", "source")}),
+        ("Timestamps", {"fields": ("created_at", "updated_at")}),
+    ]
