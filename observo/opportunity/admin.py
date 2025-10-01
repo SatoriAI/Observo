@@ -29,6 +29,7 @@ class OpportunityAdmin(ModelAdmin):
         "archived",
         "vectorized",
         "source",
+        "injection_date",
         "created_at",
         "updated_at",
     )
@@ -40,5 +41,5 @@ class OpportunityAdmin(ModelAdmin):
         ("Details", {"fields": ("opened", "closed", "archived")}),
         ("Description", {"fields": ("summary", "eligibility", "instruction")}),
         ("System Info", {"fields": ("applications", "success_rate", "vectorized", "source")}),
-        ("Timestamps", {"fields": ("created_at", "updated_at")}),
+        ("Timestamps", {"fields": ("injection_date", "created_at", "updated_at")}),
     ]

@@ -23,7 +23,12 @@ class Command(BaseCommand):
         qs = Opportunity.objects.exclude(vectorized=True).order_by("title", "id").distinct("title")
 
         for opportunity in tqdm(qs.iterator(), total=qs.count(), unit="grant"):
-            documents.append(Document(page_content=opportunity.describe(), metadata={"id": str(opportunity.id)}))
+            documents.append(
+                Document(
+                    page_content=opportunity.describe(),
+                    metadata={"id": str(opportunity.id), "funding": opportunity.funding is not None},
+                )
+            )
             counter += 1
 
         chunks = self._chunk(raw=documents, chunk_size=options["chunk_size"], chunk_overlap=options["chunk_overlap"])

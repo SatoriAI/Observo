@@ -35,8 +35,8 @@ class Opportunity(TimestampedModel):
     awards = models.PositiveSmallIntegerField(verbose_name="Number of Awards", null=True, blank=True)
     funding = models.PositiveBigIntegerField(verbose_name="Estimated Program Funding", null=True, blank=True)
 
-    opened = models.DateTimeField(verbose_name="Opening Date")
-    closed = models.DateTimeField(verbose_name="Closing Date", null=True, blank=True)
+    opened = models.DateField(verbose_name="Opening Date")
+    closed = models.DateField(verbose_name="Closing Date", null=True, blank=True)
     archived = models.DateField(verbose_name="Archiving Date", null=True, blank=True)
 
     summary = models.TextField(verbose_name="Summary Description", null=True, blank=True)
@@ -48,6 +48,7 @@ class Opportunity(TimestampedModel):
 
     vectorized = models.BooleanField(default=False)
     source = models.CharField(max_length=255, null=True, blank=True)
+    injection_date = models.DateField(verbose_name="Injection Date")
 
     def describe(self) -> str:
         parts = []

@@ -1,3 +1,5 @@
+import datetime
+
 import numpy as np
 import pandas as pd
 from django.core.management.base import BaseCommand
@@ -19,7 +21,7 @@ MODEL_CSV_MAPPING = {
     "instruction": "close_date_description",
     "archived": "archive_date",
     "awards": "expected_number_of_awards",
-    "funding": "estimated_total_program_funding",
+    "funding": "award_ceiling",
     "eligibility": "applicant_eligibility_description",
     "summary": "summary_description",
 }
@@ -37,15 +39,15 @@ class Command(BaseCommand):
         data = pd.read_csv(options["path"])
         data.replace({np.nan: None}, inplace=True)
 
-        created, updated = 0, 0
+        n_created, n_updated = 0, 0
+        injection_date = datetime.date.today()
 
         records = data.to_dict(orient="records")
         iterator = records if options["no_progress"] else tqdm(records, total=len(records), unit="row")
 
         for row in iterator:
             identifier = row[MODEL_CSV_MAPPING["id"]]
-
-            values = {}
+            values = {"source": options["path"], "injection_date": injection_date}
             for model_key, csv_key in MODEL_CSV_MAPPING.items():
                 if model_key == "id":
                     continue
@@ -61,19 +63,17 @@ class Command(BaseCommand):
 
             try:
                 opportunity, created = Opportunity.objects.update_or_create(id=identifier, **values)
-            except Exception:  # pylint: disable=too-broad-exception
+            except Exception as exc:  # pylint: disable=too-broad-exception
                 self.stdout.write(self.style.ERROR(f"Failed for {identifier}"))
+                self.stdout.write(self.style.ERROR(str(exc)))
                 return
 
-            opportunity.document = options["path"]
-            opportunity.save()
-
             if created:
-                created += 1
+                n_created += 1
             else:
-                updated += 1
+                n_updated += 1
 
         self.stdout.write(self.style.SUCCESS("Successfully injected Grants from CSV provided."))
         self.stdout.write(
-            self.style.SUCCESS(f"Command updated {updated} and created {created} Grants ({created + updated} total).")
+            self.style.SUCCESS(f"Updated {n_updated} and created {n_created} Grants ({n_created + n_updated} total).")
         )

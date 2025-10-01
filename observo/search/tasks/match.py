@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def match_proposals(pk: int, summary: str) -> None:
     logger.info(f"Matching started for: {summary.split()[:10]}")
 
-    uuids = [doc.metadata["id"] for doc in retriever_topk(k=3).invoke(summary)]
+    uuids = [doc.metadata["id"] for doc in retriever_topk(k=3, _filter={"funding": True}).invoke(summary)]
     opportunities = [Opportunity.objects.get(pk=uuid) for uuid in uuids]
 
     matched = []
