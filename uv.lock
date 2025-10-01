@@ -1246,6 +1246,15 @@ wheels = [
 ]
 
 [[package]]
+name = "lorem-text"
+version = "3.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/31/4a/0d8a3633a51e4c0ed1e9cd20accf6b485584054db323ee0448fabc14dfe0/lorem_text-3.0.tar.gz", hash = "sha256:03013aabdbc33e7280d92c20ba041b9d8f21187e0164a9323fd173be6825c865", size = 4317, upload-time = "2025-05-10T05:27:47.315Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ff/f4/d2b9b52921fbd8c1cc767f818b5dbecb5c572686168896ac8a9aa4fb43f9/lorem_text-3.0-py3-none-any.whl", hash = "sha256:0c7e3e4a64db5a9574e465cfae429d4c8606657f89c02b39eefa88f933d314e2", size = 5580, upload-time = "2025-05-10T05:27:45.868Z" },
+]
+
+[[package]]
 name = "lxml"
 version = "5.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1526,10 +1535,12 @@ dependencies = [
     { name = "langchain-community" },
     { name = "langchain-google-genai" },
     { name = "langchain-text-splitters" },
+    { name = "lorem-text" },
     { name = "pandas" },
     { name = "pgvector" },
     { name = "psycopg2-binary" },
     { name = "pygments" },
+    { name = "pylatex" },
     { name = "pytest" },
     { name = "pytz" },
     { name = "redis" },
@@ -1571,10 +1582,12 @@ requires-dist = [
     { name = "langchain-community", specifier = ">=0.3.29" },
     { name = "langchain-google-genai", specifier = ">=2.0.10" },
     { name = "langchain-text-splitters", specifier = ">=0.3.11" },
+    { name = "lorem-text", specifier = ">=3.0" },
     { name = "pandas", specifier = ">=2.3.2" },
     { name = "pgvector", specifier = ">=0.4.1" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "pygments", specifier = ">=2.19.2" },
+    { name = "pylatex", specifier = ">=1.4.2" },
     { name = "pytest", specifier = ">=8.4.1" },
     { name = "pytz", specifier = ">=2024.2" },
     { name = "redis", specifier = ">=6.4.0" },
@@ -1595,6 +1608,15 @@ dev = [
     { name = "pre-commit", specifier = ">=4.3.0" },
     { name = "pytest-cov", specifier = ">=6.2.1" },
     { name = "pytest-django", specifier = ">=4.11.1" },
+]
+
+[[package]]
+name = "ordered-set"
+version = "4.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/4c/ca/bfac8bc689799bcca4157e0e0ced07e70ce125193fc2e166d2e685b7e2fe/ordered-set-4.1.0.tar.gz", hash = "sha256:694a8e44c87657c59292ede72891eb91d34131f6531463aab3009191c77364a8", size = 12826, upload-time = "2022-01-26T14:38:56.6Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/55/af02708f230eb77084a299d7b08175cff006dea4f2721074b92cdb0296c0/ordered_set-4.1.0-py3-none-any.whl", hash = "sha256:046e1132c71fcf3330438a539928932caf51ddbc582496833e23de611de14562", size = 7634, upload-time = "2022-01-26T14:38:48.677Z" },
 ]
 
 [[package]]
@@ -2027,6 +2049,15 @@ sdist = { url = "https://files.pythonhosted.org/packages/e7/46/bd74733ff23167559
 wheels = [
     { url = "https://files.pythonhosted.org/packages/61/ad/689f02752eeec26aed679477e80e632ef1b682313be70793d798c1d5fc8f/PyJWT-2.10.1-py3-none-any.whl", hash = "sha256:dcdd193e30abefd5debf142f9adfcdd2b58004e644f25406ffaebd50bd98dacb", size = 22997, upload-time = "2024-11-28T03:43:27.893Z" },
 ]
+
+[[package]]
+name = "pylatex"
+version = "1.4.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "ordered-set" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6d/a8/10cf6b955b5fa19438790d9949867e04c785ae845e631c5ef6db444401d1/PyLaTeX-1.4.2.tar.gz", hash = "sha256:bb7b21bec57ecdba3f6f44c856ebebdf6549fd6e80661bd44fd5094236729242", size = 59710, upload-time = "2023-10-19T16:22:54.096Z" }
 
 [[package]]
 name = "pyparsing"

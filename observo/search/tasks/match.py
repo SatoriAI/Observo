@@ -20,6 +20,7 @@ def match_proposals(pk: int, summary: str) -> None:
     for opportunity in opportunities:
         matched.append(
             {
+                "id": str(opportunity.id),
                 "title": opportunity.title,
                 "max_funding": opportunity.funding,
                 "categories": parse_categories(categories=opportunity.categories),

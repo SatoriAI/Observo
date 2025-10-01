@@ -1,0 +1,80 @@
+import os
+import shutil
+import tempfile
+from pathlib import Path
+
+from pylatex import Command, Document, NoEscape, Package, escape_latex
+
+
+class LaTeXPDFGenerator:
+    def __init__(self, base_dir: Path, logo_relative_path: str | None = None) -> None:
+        self.logo_path: Path = base_dir / logo_relative_path
+
+    def _build_document(self, title: str, text: str) -> Document:
+        doc = Document(documentclass="article", document_options=["12pt", "a4paper"])
+        # Packages
+        doc.packages.append(Package("inputenc", options=["utf8"]))
+        doc.packages.append(Package("fontenc", options=["T1"]))
+        doc.packages.append(Package("graphicx"))
+        doc.packages.append(Package("geometry", options=["margin=1in"]))
+        doc.packages.append(Package("fancyhdr"))
+        doc.packages.append(Package("lastpage"))
+        doc.packages.append(Package("setspace"))
+        doc.packages.append(Package("newtxtext"))
+        doc.packages.append(Package("newtxmath"))
+
+        # Header and footer
+        doc.preamble.append(NoEscape(r"\pagestyle{fancy}"))
+        doc.preamble.append(NoEscape(r"\fancyhf{}"))
+        doc.preamble.append(NoEscape(r"\setlength{\headheight}{40pt}"))
+        doc.preamble.append(NoEscape(r"\addtolength{\topmargin}{-10pt}"))
+
+        if self.logo_path and self.logo_path.exists():
+            # Do not escape file paths for graphicx; escaping hyphens breaks paths
+            logo_tex_path = self.logo_path.as_posix()
+            doc.preamble.append(NoEscape(r"\fancyhead[L]{\includegraphics[height=1.2cm]{" + logo_tex_path + r"}}"))
+        else:
+            doc.preamble.append(NoEscape(r"\fancyhead[L]{\textbf{OpenGrant}}"))
+        doc.preamble.append(NoEscape(r"\fancyhead[R]{\today}"))
+
+        doc.preamble.append(NoEscape(r"\fancyfoot[C]{\thepage\ of \pageref{LastPage}}"))
+
+        # Line spacing
+        doc.preamble.append(NoEscape(r"\setstretch{1.2}"))
+
+        # Title style
+        doc.preamble.append(NoEscape(r"\makeatletter"))
+        doc.preamble.append(
+            NoEscape(r"\renewcommand{\maketitle}{\begin{center}{\Large\bfseries \@title \par}\end{center}}")
+        )
+        doc.preamble.append(NoEscape(r"\makeatother"))
+
+        # Title
+        doc.preamble.append(Command("title", NoEscape(escape_latex(title or ""))))
+
+        # Body
+        doc.append(NoEscape(r"\maketitle"))
+        paragraphs = (text or "").replace("\r\n", "\n").split("\n\n")
+        for idx, para in enumerate(paragraphs):
+            if para.strip() == "":
+                continue
+            doc.append(NoEscape(escape_latex(para)))
+            if idx < len(paragraphs) - 1:
+                doc.append(NoEscape("\n\n"))
+
+        return doc
+
+    def generate(self, title: str, text: str, output_path: str) -> None:
+        if not shutil.which("latexmk"):
+            raise RuntimeError(
+                "The 'latexmk' compiler was found in PATH. Install a TeX distribution and ensure it is in PATH"
+            )
+
+        try:
+            doc = self._build_document(title=title, text=text)
+            with tempfile.TemporaryDirectory() as tmpdir:
+                out_base = os.path.join(tmpdir, "document")
+                doc.generate_pdf(out_base, clean_tex=True, silent=True, compiler="latexmk", compiler_args=["-pdf"])
+                shutil.copyfile(out_base + ".pdf", output_path)
+        except Exception as exc:
+            raise RuntimeError(f"LaTeX PDF generation failed: {exc}") from exc

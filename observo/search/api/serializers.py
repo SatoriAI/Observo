@@ -3,7 +3,7 @@ import logging
 from rest_framework import serializers
 
 from search.models import Match, Notification, Website
-from search.tasks import match_proposals, scrape_website
+from search.tasks import match_proposals, prepare_outline, scrape_website
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +37,12 @@ class MatchSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data: dict[str, str]) -> Match:
-        match = Match.objects.create(website=validated_data.get("website"))
+        if not (website := validated_data.get("website")):
+            website = Website.objects.create(summary=validated_data["summary"])
+
+        match = Match.objects.create(website=website)
         match_proposals.delay(match.pk, validated_data["summary"])
+
         return match
 
 
@@ -51,3 +55,9 @@ class NotificationSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+
+    def create(self, validated_data: dict[str, str]) -> Notification:
+        notification = super().create(validated_data)
+        prepare_outline.delay(notification.pk)
+
+        return notification
