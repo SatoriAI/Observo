@@ -22,10 +22,14 @@ def match_proposals(pk: int, summary: str) -> None:
             {
                 "title": opportunity.title,
                 "max_funding": opportunity.funding,
-                "deadline": opportunity.closed.strftime("%Y/%m/%d") if opportunity.closed else None,
+                "categories": parse_categories(categories=opportunity.categories),
                 "applications": opportunity.applications,
                 "success_rate": opportunity.success_rate,
             }
         )
 
     Match.objects.filter(pk=pk).update(proposals=matched)
+
+
+def parse_categories(categories: list[str], limit: int = 20) -> list[str]:
+    return [" ".join(category.split("_")) for category in categories if len(category) <= limit]
