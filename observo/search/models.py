@@ -1,3 +1,4 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from utils.models import TimestampedModel
@@ -44,3 +45,36 @@ class Outline(TimestampedModel):
 
     def __str__(self) -> str:
         return f"Prepared Outline #{self.pk} for {self.notification.email}"
+
+
+class Workflow(TimestampedModel):
+    title = models.CharField(max_length=255, default="Workflow")
+    problem = models.TextField(help_text="The name of the problem to be solved by this Workflow.")
+
+    def __str__(self) -> str:
+        return self.title
+
+
+class Prompt(TimestampedModel):
+    name = models.CharField(max_length=255)
+    content = models.TextField()
+
+    model = models.CharField(max_length=128, default="gemini-2.5-pro")
+    temperature = models.FloatField(
+        default=0.7,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        help_text="Controls randomness of generation (0.0 = deterministic, 1.0 = maximum randomness).",
+    )
+
+    workflow = models.ForeignKey(Workflow, null=True, blank=True, on_delete=models.CASCADE, related_name="prompts")
+
+    return_variable = models.CharField(
+        null=True,
+        blank=True,
+        max_length=128,
+        verbose_name="Variable Name",
+        help_text="The name of the variable that stores the return text from the LLM. Can be used throughout Workflow.",
+    )
+
+    def __str__(self) -> str:
+        return self.name
