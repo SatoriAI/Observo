@@ -14,6 +14,10 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+# Reduce gRPC log noise (e.g., ALTS creds ignored). Must be set before gRPC initializes.
+os.environ.setdefault("GRPC_VERBOSITY", "ERROR")
+os.environ.setdefault("GRPC_TRACE", "")
+
 import environ
 
 # Define types and defaults
@@ -220,7 +224,7 @@ CELERY_BROKER_URL = env("CELERY_BROKER_URL", default=env("CELERY_BROKER_URL"))
 CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default=env("CELERY_BROKER_URL"))
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+CELERY_TASK_TIME_LIMIT = 5 * 60 * 60  # 5 hours
 CELERY_WORKER_DISABLE_RATE_LIMITS = True
 # Ensure the worker retries connecting to broker at startup (useful on orchestrators)
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
