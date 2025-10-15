@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.db.models import Count
 from unfold.admin import ModelAdmin, StackedInline
 
+from search.actions.rerun_generation import rerun_generation
 from search.actions.send_outline_action import send_outline_to_email, send_outline_to_owner
 from search.models import Match, Notification, Outline, Prompt, Website, Workflow
 
@@ -108,6 +109,7 @@ class NotificationAdmin(ModelAdmin):
         OutlineInLine,
     ]
     actions = [
+        rerun_generation,
         send_outline_to_email,
         send_outline_to_owner,
     ]
