@@ -73,8 +73,11 @@ class Prompt(TimestampedModel):
         blank=True,
         max_length=128,
         verbose_name="Variable Name",
-        help_text="The name of the variable that stores the return text from the LLM. Can be used throughout Workflow.",
+        help_text="The name of the variable that stores the return text from the LLM. Workflow scoped.",
     )
 
     def __str__(self) -> str:
         return self.name
+
+    class Meta:
+        ordering = ["pk"]

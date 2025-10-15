@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                     "return_variable",
                     models.CharField(
                         blank=True,
-                        help_text="The name of the variable that stores the return text from the LLM. Can be used throughout Workflow.",
+                        help_text="The name of the variable that stores the return text from the LLM. Can be used throughout Workflow.",  # noqa: E501
                         max_length=128,
                         null=True,
                         verbose_name="Variable Name",
