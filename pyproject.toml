@@ -38,6 +38,7 @@ dependencies = [
     "whitenoise>=6.9.0",
     "pylatex>=1.4.2",
     "lorem-text>=3.0",
+    "markdown-pdf>=1.10",
 ]
 
 [dependency-groups]

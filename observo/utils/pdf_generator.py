@@ -1,8 +1,10 @@
 import os
 import shutil
 import tempfile
+from datetime import date
 from pathlib import Path
 
+from markdown_pdf import MarkdownPdf, Section
 from pylatex import Command, Document, NoEscape, Package, escape_latex
 
 
@@ -78,3 +80,48 @@ class LaTeXPDFGenerator:
                 shutil.copyfile(out_base + ".pdf", output_path)
         except Exception as exc:
             raise RuntimeError(f"LaTeX PDF generation failed: {exc}") from exc
+
+
+class MarkdownPDFGenerator:
+    def __init__(self, base_dir: Path, logo_relative_path: str | None = None) -> None:
+        self.logo_path: Path = base_dir / logo_relative_path
+
+    def generate(self, title: str, text: str, output_path: str) -> None:
+        try:
+            normalized_title = title or ""
+            normalized_text = text or ""
+
+            # Build markdown content with a centered title via CSS
+            if normalized_title:
+                markdown_content = f"# {normalized_title}\n\n{normalized_text}"
+            else:
+                markdown_content = normalized_text
+
+            today_str = date.today().strftime("%B %d, %Y")
+            if self.logo_path and self.logo_path.exists():
+                logo_uri = self.logo_path.resolve().as_uri()
+                logo_css = f"content: url('{logo_uri}');"
+            else:
+                logo_css = "content: 'OpenGrant'; font-weight: 700;"
+
+            user_css = f"""
+@page {{
+  size: A4;
+  margin: 1in;
+  @top-left {{ {logo_css} }}
+  @top-right {{ content: '{today_str}'; }}
+  @bottom-center {{ content: counter(page) " of " counter(pages); }}
+}}
+h1:first-of-type {{
+  text-align: center;
+}}
+body {{
+  line-height: 1.2;
+}}
+"""
+
+            pdf = MarkdownPdf()
+            pdf.add_section(Section(markdown_content, user_css=user_css))
+            pdf.save(output_path)
+        except Exception as exc:
+            raise RuntimeError(f"Markdown PDF generation failed: {exc}") from exc

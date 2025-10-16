@@ -7,15 +7,22 @@ from django.conf import settings
 
 from search.models import Notification
 from utils.mailer import send_email
-from utils.pdf_generator import LaTeXPDFGenerator
+from utils.pdf_generator import LaTeXPDFGenerator, MarkdownPDFGenerator
 
 logger = logging.getLogger(__name__)
 
 
 @shared_task(name="send_outline_notification")
-def send_outline_notification(pk: int, email: str) -> None:
+def send_outline_notification(pk: int, email: str, source: str) -> None:
     notification = Notification.objects.get(pk=pk)
-    generator = LaTeXPDFGenerator(base_dir=settings.BASE_DIR, logo_relative_path="data/OpenGrant.png")
+
+    match source.lower():
+        case "pdf":
+            generator = LaTeXPDFGenerator(base_dir=settings.BASE_DIR, logo_relative_path="data/OpenGrant.png")
+        case "markdown":
+            generator = MarkdownPDFGenerator(base_dir=settings.BASE_DIR, logo_relative_path="data/OpenGrant.png")
+        case _:
+            raise ValueError("Source must be either PDF or Markdown!")
 
     tmp_paths = []
 
