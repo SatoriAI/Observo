@@ -1,7 +1,7 @@
+import base64
 import os
 import shutil
 import tempfile
-from datetime import date
 from pathlib import Path
 
 from markdown_pdf import MarkdownPdf, Section
@@ -91,37 +91,42 @@ class MarkdownPDFGenerator:
             normalized_title = title or ""
             normalized_text = text or ""
 
-            # Build markdown content with a centered title via CSS
-            if normalized_title:
-                markdown_content = f"# {normalized_title}\n\n{normalized_text}"
-            else:
-                markdown_content = normalized_text
+            # Build markdown with inline header (logo/date) and title
+            normalized_text = normalized_text.replace("\r\n", "\n")
+            parts: list[str] = []
 
-            today_str = date.today().strftime("%B %d, %Y")
+            # Build a two-column header (logo left, date right) on the same line
             if self.logo_path and self.logo_path.exists():
-                logo_uri = self.logo_path.resolve().as_uri()
-                logo_css = f"content: url('{logo_uri}');"
+                with open(self.logo_path, "rb") as logo_file:
+                    encoded_logo = base64.b64encode(logo_file.read()).decode("ascii")
+                left_html = f'<img class="logo" alt="OpenGrant" src="data:image/png;base64,{encoded_logo}" />'
             else:
-                logo_css = "content: 'OpenGrant'; font-weight: 700;"
+                left_html = '<strong class="brand">OpenGrant</strong>'
 
-            user_css = f"""
-@page {{
-  size: A4;
-  margin: 1in;
-  @top-left {{ {logo_css} }}
-  @top-right {{ content: '{today_str}'; }}
-  @bottom-center {{ content: counter(page) " of " counter(pages); }}
-}}
-h1:first-of-type {{
-  text-align: center;
-}}
-body {{
-  line-height: 1.2;
-}}
+            header_html = f'<div class="og-header">' f'<span class="og-left">{left_html}</span>' f"</div>"
+            parts.append(header_html)
+            parts.append("")  # blank line
+
+            if normalized_title:
+                parts.append(f"# {normalized_title}")
+                parts.append("")
+
+            parts.append(normalized_text)
+            markdown_full = "\n".join(parts)
+
+            # Minimal CSS compatible with MuPDF (avoid @page margin boxes)
+            user_css = """
+.og-header { width: 100%; margin-bottom: 8px; display: flex; align-items: center; }
+.og-left { text-align: left; }
+.brand { font-weight: 700; font-size: 28px; line-height: 1; display: block; }
+.logo { height: 48px; display: block; }
+h1 { text-align: center; }
+p { text-align: justify; }
+body { line-height: 1.2; }
 """
 
             pdf = MarkdownPdf()
-            pdf.add_section(Section(markdown_content, user_css=user_css))
+            pdf.add_section(Section(markdown_full), user_css=user_css)
             pdf.save(output_path)
         except Exception as exc:
             raise RuntimeError(f"Markdown PDF generation failed: {exc}") from exc

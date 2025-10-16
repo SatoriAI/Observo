@@ -98,6 +98,7 @@ class NotificationAdmin(ModelAdmin):
     list_filter = ("notified",)
     search_fields = ("email",)
     readonly_fields = (
+        "email",
         "ready",
         "notified",
         "created_at",
