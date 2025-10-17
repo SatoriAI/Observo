@@ -111,7 +111,8 @@ class MarkdownPDFGenerator:
                 parts.append(f"# {normalized_title}")
 
                 if opportunity_number:
-                    parts.append(f"Identifier: {opportunity_number}")
+                    pass
+                    # parts.append(f"Identifier: {opportunity_number}")
 
                 parts.append("")
 
