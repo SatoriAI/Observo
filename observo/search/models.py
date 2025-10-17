@@ -13,12 +13,7 @@ class Website(TimestampedModel):
 
 
 class Match(TimestampedModel):
-    website = models.ForeignKey(
-        Website,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
+    website = models.ForeignKey(Website, on_delete=models.SET_NULL, null=True, blank=True, related_name="matches")
     proposals = models.JSONField(default=list)
 
 

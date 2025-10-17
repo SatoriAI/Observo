@@ -12,16 +12,11 @@ from search.actions.send_outline_action import (
 from search.models import Match, Notification, Outline, Prompt, Website, Workflow
 
 
-class WebsiteInLine(StackedInline):
-    model = Website
-    fields = (
-        "url",
-        "summary",
-    )
-    readonly_fields = (
-        "url",
-        "summary",
-    )
+class MatchInLine(StackedInline):
+    model = Match
+    fields = ("proposals",)
+    readonly_fields = ("proposals",)
+    extra = 0
     can_delete = False
 
 
@@ -61,6 +56,7 @@ class WebsiteAdmin(ModelAdmin):
     list_display = (
         "pk",
         "url",
+        "has_matches",
         "created_at",
     )
     search_fields = ("url",)
@@ -77,30 +73,15 @@ class WebsiteAdmin(ModelAdmin):
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
     ]
 
-
-@admin.register(Match)
-class MatchAdmin(ModelAdmin):
-    list_display = (
-        "pk",
-        "website",
-        "created_at",
-    )
-    search_fields = ("summary",)
-    readonly_fields = (
-        "website",
-        "proposals",
-        "created_at",
-        "updated_at",
-    )
-
-    fieldsets = [
-        ("Generation Info", {"fields": ("proposals",)}),
-        ("Timestamps", {"fields": ("created_at", "updated_at")}),
-    ]
-
     inlines = [
-        WebsiteInLine,
+        MatchInLine,
     ]
+
+    @admin.display(description="Has Matches")
+    def has_matches(self, obj: Website) -> bool:
+        if hasattr(obj, "matches"):
+            return True
+        return False
 
 
 @admin.register(Notification)
