@@ -25,13 +25,13 @@ class MarkdownPDFGenerator:
   @top-center { content: ""; border-bottom: 1px solid #E5E7EB; padding-bottom: 8px; }
   @bottom-center {
     content: "Page " counter(page) " of " counter(pages);
-    font-size: 10pt; color: #666;
+    font-size: 10pt; color: #000;
   }
 }
 
 /* Running elements to feed @page margin boxes */
 .page-header-left { position: running(header-left); }
-.page-header-right { position: running(header-right); text-align: right; white-space: nowrap; }
+.page-header-right { position: running(header-right); text-align: right; white-space: nowrap; font-size: 10pt; color: #000; }
 
 img.logo {
   height: 15mm;
@@ -39,8 +39,7 @@ img.logo {
 }
 
         body {
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                       "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+          font-family: "Times New Roman", Times, serif;
           font-size: 11pt;
           line-height: 1.45;
         }
