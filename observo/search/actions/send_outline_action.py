@@ -10,7 +10,7 @@ def send_outline_to_owner_markdown(model_admin, request, queryset) -> None:
         if not notification.owner:
             model_admin.message_user(request, "No Owners found!")
             return
-        send_outline_notification(notification.pk, notification.owner)
+        send_outline_notification.delay(notification.pk, notification.owner)
         owners.append(notification.owner)
     model_admin.message_user(request, f"Successfully send {queryset.count()} Notification(s) to {", ".join(owners)}.")
 
