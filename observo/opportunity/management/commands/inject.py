@@ -22,6 +22,7 @@ MODEL_CSV_MAPPING = {
     "archived": "archive_date",
     "awards": "expected_number_of_awards",
     "funding": "award_ceiling",
+    "link": "additional_info_url",
     "eligibility": "applicant_eligibility_description",
     "summary": "summary_description",
 }
@@ -62,7 +63,7 @@ class Command(BaseCommand):
                         values[model_key] = int(row[csv_key])
 
             try:
-                opportunity, created = Opportunity.objects.update_or_create(id=identifier, **values)
+                opportunity, created = Opportunity.objects.update_or_create(id=identifier, defaults=values)
             except Exception as exc:  # pylint: disable=too-broad-exception
                 self.stdout.write(self.style.ERROR(f"Failed for {identifier}"))
                 self.stdout.write(self.style.ERROR(str(exc)))

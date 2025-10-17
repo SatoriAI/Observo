@@ -27,6 +27,7 @@ class Opportunity(TimestampedModel):
     identifier = models.CharField(max_length=255, unique=True, verbose_name="Opportunity Number")
     title = models.CharField(max_length=255, verbose_name="Opportunity Title")
     code = models.CharField(max_length=255, verbose_name="Opportunity Code")
+    link = models.URLField(max_length=2048, verbose_name="Opportunity URL", null=True, blank=True)
 
     agency = models.CharField(max_length=255, verbose_name="Agency Name")
     head = models.CharField(max_length=255, verbose_name="Top Level Agency Name")

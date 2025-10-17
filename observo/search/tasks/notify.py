@@ -4,6 +4,7 @@ import tempfile
 
 from celery import shared_task
 from django.conf import settings
+from opportunity.models import Opportunity
 
 from search.models import Notification
 from utils.mailer import send_email
@@ -15,6 +16,8 @@ logger = logging.getLogger(__name__)
 @shared_task(name="send_outline_notification")
 def send_outline_notification(pk: int, email: str, source: str) -> None:
     notification = Notification.objects.get(pk=pk)
+    grants_list = notification.match.proposals
+    grants = []
 
     match source.lower():
         case "pdf":
@@ -27,10 +30,18 @@ def send_outline_notification(pk: int, email: str, source: str) -> None:
     tmp_paths = []
 
     for outline in notification.outlines.all():
-        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
-            tmp_path = tmp.name
+        opportunity_id = _filter(grants=grants_list, title=outline.title)
+        opportunity = Opportunity.objects.get(pk=opportunity_id)
+        grants.append(opportunity)
 
-        generator.generate(title=outline.title, text=outline.content, output_path=tmp_path)
+        tmp_path = os.path.join(tempfile.gettempdir(), f"{opportunity.identifier}.pdf")
+
+        generator.generate(
+            title=outline.title,
+            text=outline.content,
+            output_path=tmp_path,
+            opportunity_number=opportunity.identifier,
+        )
         tmp_paths.append(tmp_path)
 
     send_email(
@@ -39,6 +50,7 @@ def send_outline_notification(pk: int, email: str, source: str) -> None:
         cc=None,
         template="email/outline.html",
         attachments=tmp_paths,
+        context={"grants": grants},
     )
 
     notification.set_notified()
@@ -49,3 +61,9 @@ def send_outline_notification(pk: int, email: str, source: str) -> None:
                 os.remove(tmp_path)
             except OSError:
                 logger.warning("Failed to remove temporary PDF %s", tmp_path)
+
+
+def _filter(grants: list[dict], title: str) -> str | None:
+    for grant in grants:
+        if grant["title"] == title:
+            return grant["id"]

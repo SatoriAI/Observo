@@ -66,7 +66,7 @@ class LaTeXPDFGenerator:
 
         return doc
 
-    def generate(self, title: str, text: str, output_path: str) -> None:
+    def generate(self, title: str, text: str, output_path: str, **kwargs: str | None) -> None:
         if not shutil.which("latexmk"):
             raise RuntimeError(
                 "The 'latexmk' compiler was found in PATH. Install a TeX distribution and ensure it is in PATH"
@@ -86,7 +86,7 @@ class MarkdownPDFGenerator:
     def __init__(self, base_dir: Path, logo_relative_path: str | None = None) -> None:
         self.logo_path: Path = base_dir / logo_relative_path
 
-    def generate(self, title: str, text: str, output_path: str) -> None:
+    def generate(self, title: str, text: str, output_path: str, opportunity_number: str | None) -> None:
         try:
             normalized_title = title or ""
             normalized_text = text or ""
@@ -109,6 +109,10 @@ class MarkdownPDFGenerator:
 
             if normalized_title:
                 parts.append(f"# {normalized_title}")
+
+                if opportunity_number:
+                    parts.append(f"Identifier: {opportunity_number}")
+
                 parts.append("")
 
             parts.append(normalized_text)
