@@ -7,8 +7,8 @@ ENV PATH=${APP_DIR}/.venv/bin:${PATH} \
 		PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-# Install uv (single static binary) and LatexMK and clean up
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates latexmk \
+# Install uv (single static binary) and libpango and clean up
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates libpangocairo-1.0-0 \
     && curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh \
     && apt-get purge -y curl \
     && rm -rf /var/lib/apt/lists/*
