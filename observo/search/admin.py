@@ -12,6 +12,19 @@ from search.actions.send_outline_action import (
 from search.models import Match, Notification, Outline, Prompt, Website, Workflow
 
 
+class WebsiteInLine(StackedInline):
+    model = Website
+    fields = (
+        "url",
+        "summary",
+    )
+    readonly_fields = (
+        "url",
+        "summary",
+    )
+    can_delete = False
+
+
 class OutlineInLine(StackedInline):
     model = Outline
     fields = (
@@ -83,6 +96,10 @@ class MatchAdmin(ModelAdmin):
     fieldsets = [
         ("Generation Info", {"fields": ("proposals",)}),
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
+    ]
+
+    inlines = [
+        WebsiteInLine,
     ]
 
 
