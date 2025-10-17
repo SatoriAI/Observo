@@ -86,7 +86,7 @@ class MarkdownPDFGenerator:
     def __init__(self, base_dir: Path, logo_relative_path: str | None = None) -> None:
         self.logo_path: Path = base_dir / logo_relative_path
 
-    def generate(self, title: str, text: str, output_path: str, opportunity_number: str | None) -> None:
+    def generate(self, title: str, text: str, output_path: str) -> None:
         try:
             normalized_title = title or ""
             normalized_text = text or ""
@@ -109,11 +109,6 @@ class MarkdownPDFGenerator:
 
             if normalized_title:
                 parts.append(f"# {normalized_title}")
-
-                if opportunity_number:
-                    pass
-                    # parts.append(f"Identifier: {opportunity_number}")
-
                 parts.append("")
 
             parts.append(normalized_text)
