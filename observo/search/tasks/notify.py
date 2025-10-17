@@ -20,7 +20,7 @@ def send_outline_notification(pk: int, email: str, source: str) -> None:
     grants = []
 
     match source.lower():
-        case "pdf":
+        case "latex":
             generator = LaTeXPDFGenerator(base_dir=settings.BASE_DIR, logo_relative_path="data/OpenGrant.png")
         case "markdown":
             generator = MarkdownPDFGenerator(base_dir=settings.BASE_DIR, logo_relative_path="data/OpenGrant.png")
