@@ -98,6 +98,7 @@ class NotificationAdmin(ModelAdmin):
     list_filter = ("notified",)
     search_fields = ("email",)
     readonly_fields = (
+        "match",
         "email",
         "ready",
         "notified",
@@ -107,7 +108,7 @@ class NotificationAdmin(ModelAdmin):
 
     fieldsets = [
         ("User Data", {"fields": ("email",)}),
-        ("System Info", {"fields": ("owner", "ready", "notified")}),
+        ("System Info", {"fields": ("match", "owner", "ready", "notified")}),
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
     ]
 

@@ -23,6 +23,7 @@ def prepare_outline(pk: int) -> None:
     logger.debug(f"Proposals for Notification #{pk}")
 
     for grant in proposals:
+        logger.info(f"Working in Grant #{grant["id"]}")
         outline = Outline.objects.create(
             notification=notification,
             title=grant["title"],
