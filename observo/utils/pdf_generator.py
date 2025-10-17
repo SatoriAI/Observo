@@ -95,7 +95,13 @@ class MarkdownPDFGenerator:
             normalized_text = normalized_text.replace("\r\n", "\n")
             parts: list[str] = []
 
-            # Build a two-column header (logo left, date right) on the same line
+            # markdown_pdf.Section expects the first row to be a top-level heading.
+            # Always start with an H1 to satisfy the hierarchy expectations.
+            heading_text = normalized_title.strip() or "Outline"
+            parts.append(f"# {heading_text}")
+            parts.append("")  # blank line after title
+
+            # Build a header block (logo left) beneath the title
             if self.logo_path and self.logo_path.exists():
                 with open(self.logo_path, "rb") as logo_file:
                     encoded_logo = base64.b64encode(logo_file.read()).decode("ascii")
@@ -107,20 +113,16 @@ class MarkdownPDFGenerator:
             parts.append(header_html)
             parts.append("")  # blank line
 
-            if normalized_title:
-                parts.append(f"# {normalized_title}")
-                parts.append("")
-
             parts.append(normalized_text)
             markdown_full = "\n".join(parts)
 
             # Minimal CSS compatible with MuPDF (avoid @page margin boxes)
             user_css = """
-.og-header { width: 100%; margin-bottom: 8px; display: flex; align-items: center; }
+.og-header { position: fixed; top: 0; left: 0; right: 0; width: 100%; display: flex; align-items: center; height: 56px; }
 .og-left { text-align: left; }
 .brand { font-weight: 700; font-size: 28px; line-height: 1; display: block; }
 .logo { height: 48px; display: block; }
-h1 { text-align: center; }
+h1 { text-align: center; margin-top: 72px; }
 p { text-align: justify; }
 body { line-height: 1.2; }
 """
