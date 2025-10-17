@@ -8,24 +8,18 @@ from opportunity.models import Opportunity
 
 from search.models import Notification
 from utils.mailer import send_email
-from utils.pdf_generator import LaTeXPDFGenerator, MarkdownPDFGenerator
+from utils.pdf_generator import MarkdownPDFGenerator
 
 logger = logging.getLogger(__name__)
 
 
 @shared_task(name="send_outline_notification")
-def send_outline_notification(pk: int, email: str, source: str) -> None:
+def send_outline_notification(pk: int, email: str) -> None:
     notification = Notification.objects.get(pk=pk)
     grants_list = notification.match.proposals
     grants = []
 
-    match source.lower():
-        case "latex":
-            generator = LaTeXPDFGenerator(base_dir=settings.BASE_DIR, logo_relative_path="data/OpenGrant.png")
-        case "markdown":
-            generator = MarkdownPDFGenerator(base_dir=settings.BASE_DIR, logo_relative_path="data/OpenGrant.png")
-        case _:
-            raise ValueError("Source must be either PDF or Markdown!")
+    generator = MarkdownPDFGenerator(base_dir=settings.BASE_DIR, logo_relative_path="data/OpenGrant.png")
 
     tmp_paths = []
 
@@ -36,7 +30,7 @@ def send_outline_notification(pk: int, email: str, source: str) -> None:
 
         tmp_path = os.path.join(tempfile.gettempdir(), f"{opportunity.identifier}.pdf")
 
-        generator.generate(title=outline.title, text=outline.content, output_path=tmp_path)
+        generator.generate(title=f"Outline for {opportunity.identifier}", text=outline.content, output_path=tmp_path)
         tmp_paths.append(tmp_path)
 
     send_email(

@@ -1,134 +1,156 @@
-import base64
-import os
-import shutil
-import tempfile
+from base64 import b64encode
+from datetime import date
 from pathlib import Path
 
-from markdown_pdf import MarkdownPdf, Section
-from pylatex import Command, Document, NoEscape, Package, escape_latex
-
-
-class LaTeXPDFGenerator:
-    def __init__(self, base_dir: Path, logo_relative_path: str | None = None) -> None:
-        self.logo_path: Path = base_dir / logo_relative_path
-
-    def _build_document(self, title: str, text: str) -> Document:
-        doc = Document(documentclass="article", document_options=["12pt", "a4paper"])
-        # Packages
-        doc.packages.append(Package("inputenc", options=["utf8"]))
-        doc.packages.append(Package("fontenc", options=["T1"]))
-        doc.packages.append(Package("graphicx"))
-        doc.packages.append(Package("geometry", options=["margin=1in"]))
-        doc.packages.append(Package("fancyhdr"))
-        doc.packages.append(Package("lastpage"))
-        doc.packages.append(Package("setspace"))
-        doc.packages.append(Package("newtxtext"))
-        doc.packages.append(Package("newtxmath"))
-
-        # Header and footer
-        doc.preamble.append(NoEscape(r"\pagestyle{fancy}"))
-        doc.preamble.append(NoEscape(r"\fancyhf{}"))
-        doc.preamble.append(NoEscape(r"\setlength{\headheight}{40pt}"))
-        doc.preamble.append(NoEscape(r"\addtolength{\topmargin}{-10pt}"))
-
-        if self.logo_path and self.logo_path.exists():
-            # Do not escape file paths for graphicx; escaping hyphens breaks paths
-            logo_tex_path = self.logo_path.as_posix()
-            doc.preamble.append(NoEscape(r"\fancyhead[L]{\includegraphics[height=1.2cm]{" + logo_tex_path + r"}}"))
-        else:
-            doc.preamble.append(NoEscape(r"\fancyhead[L]{\textbf{OpenGrant}}"))
-        doc.preamble.append(NoEscape(r"\fancyhead[R]{\today}"))
-
-        doc.preamble.append(NoEscape(r"\fancyfoot[C]{\thepage\ of \pageref{LastPage}}"))
-
-        # Line spacing
-        doc.preamble.append(NoEscape(r"\setstretch{1.2}"))
-
-        # Title style
-        doc.preamble.append(NoEscape(r"\makeatletter"))
-        doc.preamble.append(
-            NoEscape(r"\renewcommand{\maketitle}{\begin{center}{\Large\bfseries \@title \par}\end{center}}")
-        )
-        doc.preamble.append(NoEscape(r"\makeatother"))
-
-        # Title
-        doc.preamble.append(Command("title", NoEscape(escape_latex(title or ""))))
-
-        # Body
-        doc.append(NoEscape(r"\maketitle"))
-        paragraphs = (text or "").replace("\r\n", "\n").split("\n\n")
-        for idx, para in enumerate(paragraphs):
-            if para.strip() == "":
-                continue
-            doc.append(NoEscape(escape_latex(para)))
-            if idx < len(paragraphs) - 1:
-                doc.append(NoEscape("\n\n"))
-
-        return doc
-
-    def generate(self, title: str, text: str, output_path: str, **kwargs: str | None) -> None:
-        if not shutil.which("latexmk"):
-            raise RuntimeError(
-                "The 'latexmk' compiler was found in PATH. Install a TeX distribution and ensure it is in PATH"
-            )
-
-        try:
-            doc = self._build_document(title=title, text=text)
-            with tempfile.TemporaryDirectory() as tmpdir:
-                out_base = os.path.join(tmpdir, "document")
-                doc.generate_pdf(out_base, clean_tex=True, silent=True, compiler="latexmk", compiler_args=["-pdf"])
-                shutil.copyfile(out_base + ".pdf", output_path)
-        except Exception as exc:
-            raise RuntimeError(f"LaTeX PDF generation failed: {exc}") from exc
+from jinja2 import Template
+from markdown_it import MarkdownIt
+from weasyprint import HTML
 
 
 class MarkdownPDFGenerator:
+    _HTML_TEMPLATE = Template(r"""
+    <!doctype html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <title>{{ doc_title }}</title>
+      <style>
+@page {
+  size: A4;
+  margin: 2.5cm 2cm 2.5cm 2cm;     /* enough space for header */
+  /* Pin content to page edges via margin boxes */
+  @top-left { content: element(header-left); }
+  @top-right { content: element(header-right); }
+  /* Draw a subtle rule across the header width */
+  @top-center { content: ""; border-bottom: 1px solid #E5E7EB; padding-bottom: 8px; }
+  @bottom-center {
+    content: "Page " counter(page) " of " counter(pages);
+    font-size: 10pt; color: #666;
+  }
+}
+
+/* Running elements to feed @page margin boxes */
+.page-header-left { position: running(header-left); }
+.page-header-right { position: running(header-right); text-align: right; white-space: nowrap; }
+
+img.logo {
+  height: 15mm;
+  object-fit: contain;
+}
+
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                       "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+          font-size: 11pt;
+          line-height: 1.45;
+        }
+
+        h1, h2, h3 { page-break-after: avoid; margin-top: 0.5em; }
+        h1 { font-size: 22pt; }
+        h2 { font-size: 16pt; }
+        h3 { font-size: 13pt; }
+
+        p { margin: 0.6em 0; text-align: justify; text-justify: inter-word; hyphens: auto; }
+        ul, ol { margin: 0.6em 0 0.6em 1.4em; }
+
+        code, pre {
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+                       "Liberation Mono", "Courier New", monospace;
+        }
+        pre {
+          white-space: pre-wrap;
+          word-break: break-word;
+          background: #f7f7f7;
+          border: 1px solid #eee;
+          border-radius: 6px;
+          padding: 10px;
+          font-size: 9.5pt;
+          margin: 0.8em 0;
+        }
+
+        blockquote {
+          border-left: 3px solid #ddd;
+          padding-left: 10px;
+          color: #555;
+          margin: 0.6em 0;
+        }
+
+        img { max-width: 100%; page-break-inside: avoid; }
+        table { border-collapse: collapse; width: 100%; margin: 0.6em 0; }
+        th, td { border: 1px solid #e5e7eb; padding: 6px 8px; }
+        th { background: #f3f4f6; text-align: left; }
+      </style>
+    </head>
+    <body>
+        <div class="page-header-left">
+          {% if logo_data_uri %}
+            <img class="logo" src="{{ logo_data_uri }}" alt="Logo">
+          {% endif %}
+        </div>
+        <div class="page-header-right">{{ pretty_date }}</div>
+
+      <main>
+        {{ html|safe }}
+      </main>
+
+    </body>
+    </html>
+    """)
+
     def __init__(self, base_dir: Path, logo_relative_path: str | None = None) -> None:
-        self.logo_path: Path = base_dir / logo_relative_path
+        self.base_dir: Path = Path(base_dir)
+        self.logo_path: Path | None = self.base_dir / logo_relative_path if logo_relative_path else None
 
+    # ---------- public API ----------
     def generate(self, title: str, text: str, output_path: str) -> None:
-        try:
-            normalized_title = title or ""
-            normalized_text = text or ""
+        """
+        Render the provided Markdown `text` into a PDF at `output_path`.
+        A top-level H1 will be prepended using `title` if the Markdown doesn't start with a heading.
 
-            # Build markdown with inline header (logo/date) and title
-            normalized_text = normalized_text.replace("\r\n", "\n")
-            parts: list[str] = []
+        Args:
+            title: Document title (also used for HTML <title>).
+            text: Markdown content (LLM result).
+            output_path: Where to write the PDF (str or path-like).
+        """
+        markdown_text = self._ensure_title_in_markdown(title, text)
 
-            # markdown_pdf.Section expects the first row to be a top-level heading.
-            # Always start with an H1 to satisfy the hierarchy expectations.
-            heading_text = normalized_title.strip() or "Outline"
-            parts.append(f"# {heading_text}")
-            parts.append("")  # blank line after title
+        md = MarkdownIt("commonmark").enable("table").enable("strikethrough")
+        html_body = md.render(markdown_text)
 
-            # Build a header block (logo left) beneath the title
-            if self.logo_path and self.logo_path.exists():
-                with open(self.logo_path, "rb") as logo_file:
-                    encoded_logo = base64.b64encode(logo_file.read()).decode("ascii")
-                left_html = f'<img class="logo" alt="OpenGrant" src="data:image/png;base64,{encoded_logo}" />'
-            else:
-                left_html = '<strong class="brand">OpenGrant</strong>'
+        html_full = self._HTML_TEMPLATE.render(
+            html=html_body,
+            logo_data_uri=self._file_to_data_uri(self.logo_path) if self.logo_path else "",
+            pretty_date=self._pretty_date(date.today()),
+            doc_title=title or "Document",
+        )
 
-            header_html = f'<div class="og-header">' f'<span class="og-left">{left_html}</span>' f"</div>"
-            parts.append(header_html)
-            parts.append("")  # blank line
+        base_url = self.logo_path.parent.as_uri() if self.logo_path else self.base_dir.resolve().as_uri()
+        HTML(string=html_full, base_url=base_url).write_pdf(str(output_path))
 
-            parts.append(normalized_text)
-            markdown_full = "\n".join(parts)
+    # ---------- helpers ----------
+    @staticmethod
+    def _ensure_title_in_markdown(title: str, md: str) -> str:
+        stripped = md.lstrip()
+        if stripped.startswith("#"):
+            return md
+        if title:
+            return f"## {title}\n\n{md}"
+        return md
 
-            # Minimal CSS compatible with MuPDF (avoid @page margin boxes)
-            user_css = """
-.og-header { position: fixed; top: 0; left: 0; right: 0; width: 100%; display: flex; align-items: center; height: 56px; }
-.og-left { text-align: left; }
-.brand { font-weight: 700; font-size: 28px; line-height: 1; display: block; }
-.logo { height: 48px; display: block; }
-h1 { text-align: center; margin-top: 72px; }
-p { text-align: justify; }
-body { line-height: 1.2; }
-"""
+    @staticmethod
+    def _ordinal(n: int) -> str:
+        if 10 <= n % 100 <= 20:
+            suffix = "th"
+        else:
+            suffix = {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+        return f"{n}{suffix}"
 
-            pdf = MarkdownPdf()
-            pdf.add_section(Section(markdown_full), user_css=user_css)
-            pdf.save(output_path)
-        except Exception as exc:
-            raise RuntimeError(f"Markdown PDF generation failed: {exc}") from exc
+    def _pretty_date(self, d: date) -> str:
+        # e.g., "17th October 2025"
+        return f"{self._ordinal(d.day)} {d.strftime('%B %Y')}"
+
+    @staticmethod
+    def _file_to_data_uri(path: Path) -> str:
+        mime = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
+        data = b64encode(path.read_bytes()).decode("ascii")
+        return f"data:{mime};base64,{data}"
