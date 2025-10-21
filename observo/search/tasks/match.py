@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task(name="match_proposals")
-def match_proposals(pk: int, summary: str, unique_grants: int = 3) -> None:
+def match_proposals(pk: int, summary: str, funding: bool = True, unique_grants: int = 3) -> None:
     logger.info(f"Matching started for: {summary.split()[:10]}")
 
     avg_chunks_per_doc = get_avg_chunks_per_doc()
@@ -22,12 +22,12 @@ def match_proposals(pk: int, summary: str, unique_grants: int = 3) -> None:
 
     retriever = store().as_retriever(
         search_type="mmr",
-        search_kwargs={"k": k, "fetch_k": k, "lambda_mult": 0.3, "filter": {"funding": True}},
+        search_kwargs={"k": k, "fetch_k": k, "lambda_mult": 0.3, "filter": {"funding": funding}},
     )
 
     docs = retriever.invoke(summary)
     # Also compute scored similarities and keep the best (lowest) distance per opportunity id
-    scored = store().similarity_search_with_score(summary, k=k, filter={"funding": True})
+    scored = store().similarity_search_with_score(summary, k=k, filter={"funding": funding})
     id_to_distance: dict[str, float] = {}
     for scored_doc, distance in scored:
         gid = scored_doc.metadata.get("id")

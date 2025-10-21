@@ -26,6 +26,7 @@ class WebsiteSerializer(serializers.ModelSerializer):
 
 class MatchSerializer(serializers.ModelSerializer):
     summary = serializers.CharField(write_only=True)
+    funding = serializers.BooleanField(write_only=True, default=True, help_text="If True only Grants with funding.")
 
     class Meta:
         model = Match
@@ -41,7 +42,7 @@ class MatchSerializer(serializers.ModelSerializer):
             website = Website.objects.create(summary=validated_data["summary"])
 
         match = Match.objects.create(website=website)
-        match_proposals.delay(match.pk, validated_data["summary"])
+        match_proposals.delay(match.pk, validated_data["summary"], validated_data["funding"])
 
         return match
 
