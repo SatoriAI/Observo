@@ -6,6 +6,7 @@ from celery import shared_task
 from django.conf import settings
 from opportunity.models import Opportunity
 
+from search.enums import OutlineAction
 from search.models import Notification
 from utils.mailer import send_email
 from utils.pdf_generator import MarkdownPDFGenerator
@@ -14,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task(name="send_outline_notification")
-def send_outline_notification(pk: int, email: str) -> None:
+def send_outline_notification(pk: int, email: str, mode: int = OutlineAction) -> None:
     notification = Notification.objects.get(pk=pk)
     grants_list = notification.match.proposals
     grants = []
@@ -42,7 +43,9 @@ def send_outline_notification(pk: int, email: str) -> None:
         context={"grants": grants},
     )
 
-    notification.set_notified()
+    if mode == OutlineAction.SEND_TO_CLIENT:
+        logger.info("Sending outline notification to the client, setting notified parameter")
+        notification.set_notified()
 
     for tmp_path in tmp_paths:
         if tmp_path and os.path.exists(tmp_path):

@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from search.enums import OutlineAction
 from search.tasks import send_outline_notification
 
 
@@ -10,15 +11,15 @@ def send_outline_to_owner_markdown(model_admin, request, queryset) -> None:
         if not notification.owner:
             model_admin.message_user(request, "No Owners found!")
             return
-        send_outline_notification.delay(notification.pk, notification.owner)
+        send_outline_notification.delay(notification.pk, notification.owner, OutlineAction.SEND_TO_OWNER)
         owners.append(notification.owner)
     model_admin.message_user(request, f"Successfully send {queryset.count()} Notification(s) to {", ".join(owners)}.")
 
 
 @admin.action(description="Send Outline to Users")
-def send_outline_to_email_markdown(model_admin, request, queryset) -> None:
+def send_outline_to_client_markdown(model_admin, request, queryset) -> None:
     emails = []
     for notification in queryset:
-        send_outline_notification.delay(notification.pk, notification.email)
+        send_outline_notification.delay(notification.pk, notification.email, OutlineAction.SEND_TO_CLIENT)
         emails.append(notification.email)
     model_admin.message_user(request, f"Successfully send {queryset.count()} Notification(s) to {", ".join(emails)}.")

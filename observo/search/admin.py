@@ -4,7 +4,7 @@ from unfold.admin import ModelAdmin, StackedInline
 
 from search.actions.rerun_generation import rerun_generation
 from search.actions.send_outline_action import (
-    send_outline_to_email_markdown,
+    send_outline_to_client_markdown,
     send_outline_to_owner_markdown,
 )
 from search.models import Match, Notification, Outline, Prompt, Website, Workflow
@@ -113,7 +113,7 @@ class NotificationAdmin(ModelAdmin):
     ]
     actions = [
         rerun_generation,
-        send_outline_to_email_markdown,
+        send_outline_to_client_markdown,
         send_outline_to_owner_markdown,
     ]
 
