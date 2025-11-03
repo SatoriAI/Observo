@@ -24,7 +24,7 @@ def send_outline_notification(pk: int, email: str, mode: int = OutlineAction) ->
 
     tmp_paths = []
 
-    for outline in notification.outlines.all():
+    for outline in notification.outlines.order_by("-created_at")[:3]:
         opportunity_id = _filter(grants=grants_list, title=outline.title)
         opportunity = Opportunity.objects.get(pk=opportunity_id)
         grants.append(opportunity)
