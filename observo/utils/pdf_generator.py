@@ -133,7 +133,7 @@ img.logo {
         if stripped.startswith("#"):
             return md
         if title:
-            return f"## {title}\n\n{md}"
+            return f"### {title}\n\n{md}"
         return md
 
     @staticmethod
