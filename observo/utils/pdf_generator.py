@@ -48,6 +48,7 @@ img.logo {
         h1 { font-size: 22pt; }
         h2 { font-size: 16pt; }
         h3 { font-size: 13pt; }
+        h3.doc-title { text-align: center; }
 
         p { margin: 0.6em 0; text-align: justify; text-justify: inter-word; hyphens: auto; }
         ul, ol { margin: 0.6em 0 0.6em 1.4em; }
@@ -133,7 +134,7 @@ img.logo {
         if stripped.startswith("#"):
             return md
         if title:
-            return f"### {title}\n\n{md}"
+            return f'<h3 class="doc-title">{title}</h3>\n\n{md}'
         return md
 
     @staticmethod

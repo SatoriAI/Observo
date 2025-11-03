@@ -31,12 +31,8 @@ def send_outline_notification(pk: int, email: str, mode: int = OutlineAction) ->
 
         tmp_path = os.path.join(tempfile.gettempdir(), f"{opportunity.identifier}.pdf")
 
-        display_title = opportunity.title
-        if opportunity.link:
-            display_title = f"[{opportunity.title}]({opportunity.link})"
-
         generator.generate(
-            title=display_title,
+            title="Outline for " + outline.title,
             text=outline.content,
             output_path=tmp_path,
             header_right_text=opportunity.identifier,
