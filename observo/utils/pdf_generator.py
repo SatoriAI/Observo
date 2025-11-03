@@ -86,7 +86,7 @@ img.logo {
             <img class="logo" src="{{ logo_data_uri }}" alt="Logo">
           {% endif %}
         </div>
-        <div class="page-header-right">{{ pretty_date }}</div>
+        <div class="page-header-right">{{ header_right_text }}</div>
 
       <main>
         {{ html|safe }}
@@ -101,7 +101,7 @@ img.logo {
         self.logo_path: Path | None = self.base_dir / logo_relative_path if logo_relative_path else None
 
     # ---------- public API ----------
-    def generate(self, title: str, text: str, output_path: str) -> None:
+    def generate(self, title: str, text: str, output_path: str, header_right_text: str | None = None) -> None:
         """
         Render the provided Markdown `text` into a PDF at `output_path`.
         A top-level H1 will be prepended using `title` if the Markdown doesn't start with a heading.
@@ -119,7 +119,7 @@ img.logo {
         html_full = self._HTML_TEMPLATE.render(
             html=html_body,
             logo_data_uri=self._file_to_data_uri(self.logo_path) if self.logo_path else "",
-            pretty_date=self._pretty_date(date.today()),
+            header_right_text=header_right_text or self._pretty_date(date.today()),
             doc_title=title or "Document",
         )
 
