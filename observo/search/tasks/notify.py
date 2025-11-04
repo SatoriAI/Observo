@@ -23,11 +23,13 @@ def send_outline_notification(pk: int, email: str, mode: int = OutlineAction) ->
     generator = MarkdownPDFGenerator(base_dir=settings.BASE_DIR, logo_relative_path="data/OpenGrant.png")
 
     tmp_paths = []
+    opportunities = []
 
     for outline in notification.outlines.order_by("-created_at")[:3]:
         opportunity_id = _filter(grants=grants_list, title=outline.title)
         opportunity = Opportunity.objects.get(pk=opportunity_id)
         grants.append(opportunity)
+        opportunities.append(opportunity.identifier)
 
         tmp_path = os.path.join(tempfile.gettempdir(), f"{opportunity.identifier}.pdf")
 
@@ -40,7 +42,7 @@ def send_outline_notification(pk: int, email: str, mode: int = OutlineAction) ->
         tmp_paths.append(tmp_path)
 
     send_email(
-        subject="Your personalised outline",
+        subject=f"Your personalised outlines for {', '.join(opportunities)}",
         recipients=[email],
         cc=None,
         template="email/outline.html",
