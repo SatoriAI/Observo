@@ -5,8 +5,9 @@ from celery import shared_task
 from lorem_text import lorem
 from opportunity.models import Opportunity
 
+from search.enums import Workflows
 from search.models import Notification, Outline, Workflow
-from utils.clients import GeminiClient
+from search.tasks import send_post_generation_notification
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ def prepare_outline(pk: int) -> None:
     for grant in proposals:
         logger.info(f"Working in Grant #{grant["id"]}")
         outline = Outline.objects.create(
+            opportunity=Opportunity.objects.get(pk=grant["id"]),
             notification=notification,
             title=grant["title"],
             content=get_content(summary=summary, identifier=grant["id"], debug=False),
@@ -32,6 +34,7 @@ def prepare_outline(pk: int) -> None:
         logger.info(f"Outline #{outline.pk} created successfully")
 
     notification.set_ready()
+    send_post_generation_notification.delay(notification.pk)
 
 
 def get_content(summary: str, identifier: UUID, debug: bool = False) -> str | None:
@@ -39,19 +42,6 @@ def get_content(summary: str, identifier: UUID, debug: bool = False) -> str | No
         return lorem.paragraphs(3)
 
     opportunity = Opportunity.objects.get(id=identifier)
-    workflow = Workflow.objects.first()
+    workflow = Workflow.objects.filter(title=Workflows.OUTLINE_PREPARER).first()
 
-    context = {"summary": summary, "opportunity": opportunity.describe()}
-
-    generated = None
-
-    for prompt in workflow.prompts.all():
-        logger.info(f"Processing Prompt {prompt.name} (#{prompt.pk})")
-
-        gemini_client = GeminiClient(model=prompt.model, prompt=prompt.content, temperature=prompt.temperature)
-        response = gemini_client.generate(context=context)
-
-        generated = response.text
-        context[prompt.return_variable] = generated
-
-    return generated
+    return workflow.process(context={"summary": summary, "opportunity": opportunity.describe()}, logger=logger)

@@ -198,6 +198,7 @@ REST_FRAMEWORK = {
 }
 
 # Own Environmental Variables
+HOST = env("HOST")
 IP_SALT = env("IP_SALT")
 CALENDLY_KEY = env("CALENDLY_KEY")
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")

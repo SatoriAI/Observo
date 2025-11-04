@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from typing import Any
 
 import requests
-from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from rest_framework import status
 
@@ -21,23 +20,6 @@ class MailSendResult:
     success: bool
     provider: str
     message: str
-
-
-def _send_via_smtp(
-    subject: str, html_content: str, recipients: list[str], cc: list[str] | None, attachments: list[str] | None = None
-) -> MailSendResult:
-    email = EmailMultiAlternatives(
-        subject=subject, body=html_content, from_email=f"Grant Flow <{settings.EMAIL_FROM}>", to=recipients, cc=cc
-    )
-    email.attach_alternative(html_content, "text/html")
-    if attachments:
-        for path in attachments:
-            try:
-                email.attach_file(path)
-            except Exception as exc:  # pragma: no cover - non-critical attach failure should not block send
-                logger.warning("Failed to attach %s via SMTP: %s", path, exc)
-    sent = email.send()
-    return MailSendResult(success=bool(sent), provider="smtp", message=f"SMTP send returned {sent}")
 
 
 def _send_via_resend(
@@ -111,9 +93,5 @@ def send_email(
             return
         # fall back to SMTP if HTTP failed
         logger.warning("Falling back to SMTP after Resend failure: %s", result.message)
-
-    # SMTP path (may fail on restricted hosts)
-    result = _send_via_smtp(subject, html_content, recipients, cc, attachments)
-    if not result.success:
-        logger.error("SMTP send failed: %s", result.message)
-        raise RuntimeError("Failed to send email")
+    else:
+        raise ValueError("Please add RESEND_API_KEY to environment variables!")
