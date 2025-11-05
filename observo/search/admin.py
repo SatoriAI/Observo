@@ -1,11 +1,16 @@
 from django.contrib import admin
 from django.db.models import Count
+from django.urls import reverse
+from django.utils.html import format_html
 from unfold.admin import ModelAdmin, StackedInline
 
 from search.actions.rerun_generation import rerun_generation
 from search.actions.send_outline_action import (
     send_outline_to_client_markdown,
     send_outline_to_owner_markdown,
+)
+from search.actions.website_outline_action import (
+    create_notification_and_prepare_outline,
 )
 from search.models import (
     Match,
@@ -98,6 +103,10 @@ class WebsiteAdmin(ModelAdmin):
         MatchInLine,
     ]
 
+    actions = [
+        create_notification_and_prepare_outline,
+    ]
+
     @admin.display(description="Has Matches")
     def has_matches(self, obj: Website) -> bool:
         if hasattr(obj, "matches"):
@@ -110,6 +119,7 @@ class NotificationAdmin(ModelAdmin):
     list_display = (
         "email",
         "owner",
+        "website",
         "ready",
         "notified",
         "created_at",
@@ -117,7 +127,7 @@ class NotificationAdmin(ModelAdmin):
     list_filter = ("notified",)
     search_fields = ("email",)
     readonly_fields = (
-        "match",
+        "website",
         "email",
         "ready",
         "notified",
@@ -127,7 +137,7 @@ class NotificationAdmin(ModelAdmin):
 
     fieldsets = [
         ("User Data", {"fields": ("email",)}),
-        ("System Info", {"fields": ("match", "owner", "ready", "notified")}),
+        ("System Info", {"fields": ("website", "owner", "ready", "notified")}),
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
     ]
 
@@ -140,6 +150,15 @@ class NotificationAdmin(ModelAdmin):
         send_outline_to_client_markdown,
         send_outline_to_owner_markdown,
     ]
+
+    @admin.display(description="Website", ordering="match__website__url")
+    def website(self, obj: Notification) -> str:
+        if not getattr(obj, "match", None) or not getattr(obj.match, "website", None):
+            return "—"
+        website = obj.match.website
+        url = reverse("admin:search_website_change", args=[website.pk])
+        label = website.url or f"Website #{website.pk}"
+        return format_html('<a href="{}">{}</a>', url, label)
 
 
 @admin.register(Workflow)
