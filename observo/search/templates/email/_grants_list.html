@@ -1,0 +1,11 @@
+<ul>
+    {% for grant in grants %}
+        <li>({{ grant.identifier }})
+            {% if grant.link %}
+                <a href="{{ grant.link }}" target="_blank">{{ grant.title }}</a>
+            {% else %}
+                {{ grant.title }}
+            {% endif %}
+        </li>
+    {% endfor %}
+ </ul>

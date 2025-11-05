@@ -7,7 +7,15 @@ from search.actions.send_outline_action import (
     send_outline_to_client_markdown,
     send_outline_to_owner_markdown,
 )
-from search.models import Match, Notification, Outline, Prompt, Website, Workflow
+from search.models import (
+    Match,
+    Notification,
+    NotificationEmailBlock,
+    Outline,
+    Prompt,
+    Website,
+    Workflow,
+)
 
 
 class MatchInLine(StackedInline):
@@ -32,6 +40,21 @@ class OutlineInLine(StackedInline):
         "updated_at",
     )
     extra = 0
+
+
+class NotificationEmailBlockInline(StackedInline):
+    model = NotificationEmailBlock
+    fields = (
+        "is_active",
+        "html",
+        "created_at",
+        "updated_at",
+    )
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+    )
+    extra = 1
 
 
 class PromptInline(StackedInline):
@@ -109,6 +132,7 @@ class NotificationAdmin(ModelAdmin):
     ]
 
     inlines = [
+        NotificationEmailBlockInline,
         OutlineInLine,
     ]
     actions = [

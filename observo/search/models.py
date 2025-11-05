@@ -49,6 +49,24 @@ class Outline(TimestampedModel):
         return f"Prepared Outline #{self.pk} for {self.notification.email}"
 
 
+class NotificationEmailBlock(TimestampedModel):
+    notification = models.OneToOneField(Notification, on_delete=models.CASCADE, related_name="email_block")
+    is_active = models.BooleanField(
+        default=False,
+        help_text="Enable to override the default main section of the outline email for this notification.",
+    )
+    html = models.TextField(
+        blank=True,
+        help_text=(
+            "Custom HTML for the main section. Django template syntax is supported. "
+            "You can use placeholders like {{ grants_list_html }} and {{ calendly_link }}."
+        ),
+    )
+
+    def __str__(self) -> str:
+        return f"Email Block for Notification #{self.notification.pk}"
+
+
 class Workflow(TimestampedModel):
     title = models.CharField(max_length=255, default="Workflow")
     problem = models.TextField(help_text="The name of the problem to be solved by this Workflow.")

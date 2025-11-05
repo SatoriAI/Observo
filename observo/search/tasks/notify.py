@@ -47,7 +47,7 @@ def send_outline_notification(pk: int, email: str, mode: int = OutlineAction) ->
         cc=None,
         template="email/outline.html",
         attachments=tmp_paths,
-        context={"grants": grants},
+        context={"grants": grants, "notification": notification},
     )
 
     if mode == OutlineAction.SEND_TO_CLIENT:
