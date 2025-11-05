@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin, StackedInline
 
+from search.actions.mark_websites_as_test_action import mark_websites_as_test
 from search.actions.merge_websites_action import merge_websites
 from search.actions.rerun_generation import rerun_generation
 from search.actions.send_outline_action import (
@@ -84,6 +85,7 @@ class WebsiteAdmin(ModelAdmin):
         "pk",
         "url",
         "has_matches",
+        "test",
         "created_at",
     )
     search_fields = ("url",)
@@ -107,6 +109,7 @@ class WebsiteAdmin(ModelAdmin):
     actions = [
         create_notification_and_prepare_outline,
         merge_websites,
+        mark_websites_as_test,
     ]
 
     @admin.display(description="Has Matches")

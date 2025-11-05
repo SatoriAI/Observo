@@ -26,5 +26,3 @@ def merge_websites(model_admin, request, queryset) -> None:
         request,
         f"Merged Websites #{primary.pk} <-> #{secondary.pk}: moved {moved} Match(es).",
     )
-
-

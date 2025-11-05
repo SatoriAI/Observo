@@ -11,6 +11,9 @@ from utils.models import TimestampedModel
 class Website(TimestampedModel):
     url = models.URLField(null=True, blank=True, verbose_name="URL")
     summary = models.TextField(null=True, blank=True)
+    test = models.BooleanField(
+        default=False, help_text="Indicates whether this website was created for testing purposes."
+    )
 
     def __str__(self) -> str:
         return self.url or "Empty URL"
