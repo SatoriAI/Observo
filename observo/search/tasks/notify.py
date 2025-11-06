@@ -71,7 +71,7 @@ def send_post_generation_notification(pk: int) -> None:
     ]
 
     send_email(
-        subject=f"[Notification #{notification.pk}] Outlines for {notification.email} ready!",
+        subject=f"[Notification #{notification.pk}] Outlines for {notification.email} ({notification.match.website.url or 'Unknown Website'}) are ready!",
         recipients=[notification.owner or "casper@open-grant.com"],
         cc=["dawid@open-grant.com"],
         template="email/generation.html",
