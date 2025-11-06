@@ -45,8 +45,8 @@ def render_outline_main(context, notification, grants):
         # Table may not exist yet if migrations haven't been applied
         block = None
 
-    # If a block exists and has HTML, use it (presence implies activation)
-    if block and getattr(block, "html", "").strip():
+    # If a block exists, is active and has HTML, use it
+    if block and getattr(block, "is_active", False) and getattr(block, "html", "").strip():
         try:
             tmpl = DjTemplate(block.html)
             return mark_safe(tmpl.render(Context(base_ctx)))
@@ -61,6 +61,11 @@ def render_outline_main(context, notification, grants):
     if not block:
         logger.debug(
             "No NotificationEmailBlock found for Notification #%s; using default.",
+            getattr(notification, "pk", "?"),
+        )
+    elif not getattr(block, "is_active", False):
+        logger.debug(
+            "NotificationEmailBlock is inactive for Notification #%s; using default.",
             getattr(notification, "pk", "?"),
         )
     elif not getattr(block, "html", "").strip():
