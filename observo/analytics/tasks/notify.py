@@ -2,8 +2,10 @@ import logging
 import time
 
 from celery import shared_task
+from django.conf import settings
+from django.urls import reverse
 
-from analytics.models import Contact
+from analytics.models import Contact, Survey
 from utils.functions import compute_greetings
 from utils.mailer import send_email
 
@@ -83,4 +85,35 @@ def notify_contact(contact_id: int) -> None:
         raise
     except Exception as e:
         logger.error(f"Error in notify_contact task for contact_id {contact_id}: {str(e)}", exc_info=True)
+        raise
+
+
+@shared_task(name="notify_new_survey")
+def notify_new_survey(survey_id: int) -> None:
+    logger.info(f"Starting notify_new_survey task for survey_id: {survey_id}")
+
+    try:
+        survey = Survey.objects.get(id=survey_id)
+
+        admin_path = reverse("admin:analytics_survey_change", args=[survey.pk])
+        admin_url = f"{settings.HOST}{admin_path}"
+
+        send_email(
+            subject=f"[Survey #{survey.pk}] New Survey received",
+            recipients=["casper@open-grant.com"],
+            cc=["dawid@open-grant.com"],
+            template="email/survey_created.html",
+            context={
+                "survey": survey,
+                "survey_admin_url": admin_url,
+            },
+        )
+
+        logger.info(f"notify_new_survey task completed successfully for survey_id: {survey_id}")
+
+    except Survey.DoesNotExist:
+        logger.error(f"Survey with ID {survey_id} does not exist")
+        raise
+    except Exception as e:
+        logger.error(f"Error in notify_new_survey task for survey_id {survey_id}: {str(e)}", exc_info=True)
         raise

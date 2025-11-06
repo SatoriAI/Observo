@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>New Survey Notification</title>
+        <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-weight: normal;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 80%;
+            margin: auto;
+        }
+
+        header, .signature {
+            margin: 0;
+        }
+
+        .signature {
+            padding-top: 2%;
+            font-size: 14px;
+            color: #4a4a4a;
+        }
+
+        a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .cta-button {
+            display: block;
+            background-color: #1a73e8;
+            color: white !important;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px auto;
+            width: fit-content;
+            box-shadow: 0 2px 4px rgba(26, 115, 232, 0.2);
+        }
+
+        .cta-button:hover {
+            background-color: #1557b0;
+            box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+        }
+
+        footer {
+            background: #fafafa;
+            padding: 2%;
+            color: #999;
+            text-align: center;
+            border-top: 1px solid #e8e8e8;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <p>New Survey received.</p>
+            </header>
+            <main>
+                <p>A new Survey has been created in the system.</p>
+
+                <ul>
+                    <li><b>ID:</b> {{ survey.id }}</li>
+                    <li><b>Website:</b> {{ survey.website|default:"—" }}</li>
+                    <li><b>Sector:</b> {{ survey.sector|default:"—" }}</li>
+                    <li><b>Eager to Pay:</b> {{ survey.eager_to_pay }}</li>
+                    <li><b>Locale:</b> {{ survey.locale|default:"—" }}</li>
+                    <li><b>Geolocation:</b> {{ survey.geolocation|default:"—" }}</li>
+                    <li><b>Referrer:</b> {{ survey.referrer|default:"—" }}</li>
+                </ul>
+
+                <a href="{{ survey_admin_url }}" class="cta-button" target="_blank">View Survey in Admin</a>
+            </main>
+            <div class="signature">
+                <p>Regards!</p>
+                <p>
+                    OpenGrant
+                </p>
+            </div>
+            <footer>
+                <p>&copy; {% now "Y" %} <a href="https://open-grant.com" style="color: #1a73e8;">OpenGrant</a>. All rights reserved.</p>
+            </footer>
+        </div>
+    </body>
+</html>
+
+
