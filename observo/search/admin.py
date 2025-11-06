@@ -85,6 +85,7 @@ class WebsiteAdmin(ModelAdmin):
         "pk",
         "url",
         "has_matches",
+        "has_notification",
         "test",
         "created_at",
     )
@@ -117,6 +118,10 @@ class WebsiteAdmin(ModelAdmin):
         if hasattr(obj, "matches"):
             return True
         return False
+
+    @admin.display(description="Has Notification")
+    def has_notification(self, obj: Website) -> bool:
+        return Notification.objects.filter(match__website=obj).exists()
 
 
 @admin.register(Notification)
