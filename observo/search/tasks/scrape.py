@@ -49,12 +49,13 @@ def scrape_website(pk: int) -> None:
     logger.info(f"Scraping ended for: {website.url}")
 
     # Trigger automatic outline preparation once summary is available
-    try:
-        from search.tasks.outline import auto_prepare_outline_for_website
+    if not website.grantflow:  # If website summary comes from GrantFlow request then outlines are not needed
+        try:
+            from search.tasks.outline import auto_prepare_outline_for_website
 
-        auto_prepare_outline_for_website.delay(website.pk)
-    except Exception as e:
-        logger.warning("Failed to enqueue auto outline preparation: %s", e)
+            auto_prepare_outline_for_website.delay(website.pk)
+        except Exception as e:
+            logger.warning("Failed to enqueue auto outline preparation: %s", e)
 
 
 def get_html(url: str) -> bytes | None:

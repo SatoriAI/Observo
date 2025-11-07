@@ -11,12 +11,20 @@ from utils.models import TimestampedModel
 class Website(TimestampedModel):
     url = models.URLField(null=True, blank=True, verbose_name="URL")
     summary = models.TextField(null=True, blank=True)
+    grantflow = models.BooleanField(
+        default=False,
+        verbose_name="GrantFlow",
+        help_text="Indicates whether this website was fetched after GrantFlow request.",
+    )
     test = models.BooleanField(
         default=False, help_text="Indicates whether this website was created for testing purposes."
     )
 
     def __str__(self) -> str:
         return self.url or "Empty URL"
+
+
+9
 
 
 class Match(TimestampedModel):
@@ -74,11 +82,15 @@ class Workflow(TimestampedModel):
     title = models.CharField(max_length=255, default="Workflow")
     problem = models.TextField(help_text="The name of the problem to be solved by this Workflow.")
 
+    @property
+    def n(self) -> int:
+        return self.prompts.count()
+
     def process(self, context: dict[str, Any], logger: Logger) -> str:
         generated = None
 
-        for prompt in self.prompts.all():
-            logger.info(f"Processing Prompt {prompt.name} (#{prompt.pk})")
+        for index, prompt in enumerate(self.prompts.all(), start=1):
+            logger.info(f"Processing Prompt #{prompt.pk} ({index}/{self.n}): {prompt.name}")
 
             gemini_client = GeminiClient(model=prompt.model, prompt=prompt.content, temperature=prompt.temperature)
             response = gemini_client.generate(context=context)

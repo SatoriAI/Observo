@@ -86,8 +86,13 @@ class WebsiteAdmin(ModelAdmin):
         "url",
         "has_matches",
         "has_notification",
+        "grantflow",
         "test",
         "created_at",
+    )
+    list_filter = (
+        "test",
+        "grantflow",
     )
     search_fields = ("url",)
     readonly_fields = (
