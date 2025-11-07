@@ -19,7 +19,7 @@ class WebsiteSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data: dict[str, str]) -> Website:
-        website = Website.objects.create(url=validated_data["url"])
+        website = Website.objects.create(url=validated_data["url"], grantflow=validated_data.get("grantflow", False))
         scrape_website.delay(website.pk)
         return website
 
