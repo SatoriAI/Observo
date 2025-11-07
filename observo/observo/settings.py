@@ -229,3 +229,7 @@ CELERY_TASK_TIME_LIMIT = 5 * 60 * 60  # 5 hours
 CELERY_WORKER_DISABLE_RATE_LIMITS = True
 # Ensure the worker retries connecting to broker at startup (useful on orchestrators)
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_TASK_DEFAULT_QUEUE = "celery"
+CELERY_TASK_ROUTES = {
+    "scrape_website": {"queue": "scrape"},
+}

@@ -42,7 +42,7 @@ def send_outline_notification(pk: int, email: str, mode: int = OutlineAction) ->
         tmp_paths.append(tmp_path)
 
     send_email(
-        subject=f"Your personalised outlines for {', '.join(opportunities)}",
+        subject=f"Your personalized outlines for {', '.join(opportunities)}",
         recipients=[email],
         cc=None,
         template="email/outline.html",

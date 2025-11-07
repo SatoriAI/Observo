@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  worker_default:
+    build: .
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    command: >
+      sh -c "
+        cd observo &&
+        uv run --no-sync --no-dev celery -A observo.celery worker -n worker-default@%h -Q celery --loglevel=info --concurrency 2 --prefetch-multiplier=1
+      "
+
+  worker_scrape:
+    build: .
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    command: >
+      sh -c "
+        cd observo &&
+        uv run --no-sync --no-dev celery -A observo.celery worker -n worker-scrape@%h -Q scrape --loglevel=info --concurrency 2 --prefetch-multiplier=1
+      "
+
+
