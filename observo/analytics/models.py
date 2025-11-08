@@ -38,7 +38,7 @@ class Contact(TimestampedModel):
 
     notified = models.BooleanField(default=False, help_text="Indicates whether the contact has been notified.")
     active_subscription = models.BooleanField(
-        default=False, help_text="Indicates whether the contact has an active subscription."
+        default=True, help_text="Indicates whether the contact has an active subscription."
     )
 
     def __str__(self) -> str:
