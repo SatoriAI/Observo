@@ -6,6 +6,7 @@ from analytics.api.views import (
     ContactCreateView,
     CreateMeetingView,
     SurveyCreateView,
+    unsubscribe_contact,
 )
 
 app_name = "analytics"
@@ -16,4 +17,5 @@ urlpatterns = [
     path("meetings/", CreateMeetingView.as_view(), name="api-meetings-create"),
     path("data/", AvailableDataView.as_view(), name="api-available-data"),
     path("analytics/", AnalyticsOverviewView.as_view(), name="api-analytics-overview"),
+    path("unsubscribe/<str:token>/", unsubscribe_contact, name="unsubscribe"),
 ]

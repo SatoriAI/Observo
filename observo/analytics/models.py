@@ -37,6 +37,9 @@ class Contact(TimestampedModel):
     description = models.TextField(null=True, blank=True)
 
     notified = models.BooleanField(default=False, help_text="Indicates whether the contact has been notified.")
+    active_subscription = models.BooleanField(
+        default=True, help_text="Indicates whether the contact has an active subscription."
+    )
 
     def __str__(self) -> str:
         return f"Contact #{self.pk} left by {self.email}"

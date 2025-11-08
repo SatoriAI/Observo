@@ -1,5 +1,8 @@
+from django.core.signing import BadSignature, Signer
 from django.db.models import Case, Count, Exists, IntegerField, OuterRef, Sum, When
 from django.db.models.functions import TruncDay, TruncWeek
+from django.http import HttpResponse
+from django.views.decorators.http import require_http_methods
 from rest_framework import generics, permissions
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -8,6 +11,26 @@ from rest_framework.response import Response
 from analytics.api.filters import SurveyFilter
 from analytics.api.serializers import AvailableDataSerializer, ContactSerializer, MeetingSerializer, SurveySerializer
 from analytics.models import Contact, Meeting, Survey
+
+
+@require_http_methods(["GET"])
+def unsubscribe_contact(request, token: str):
+    signer = Signer()
+    try:
+        contact_id = int(signer.unsign(token))
+    except (BadSignature, ValueError):
+        return HttpResponse("Invalid unsubscribe link.", status=400)
+
+    try:
+        contact = Contact.objects.get(id=contact_id)
+    except Contact.DoesNotExist:
+        return HttpResponse("Contact not found.", status=404)
+
+    if contact.active_subscription:
+        contact.active_subscription = False
+        contact.save()
+
+    return HttpResponse("You have been unsubscribed from future emails.")
 
 
 class SurveyCreateView(generics.CreateAPIView):

@@ -3,6 +3,7 @@ import time
 
 from celery import shared_task
 from django.conf import settings
+from django.core.signing import Signer
 from django.urls import reverse
 
 from analytics.models import Contact, Survey
@@ -61,16 +62,20 @@ def notify_contact(contact_id: int) -> None:
         cc_list = ["casper@open-grant.com"]
         logger.info(
             f"Preparing to send email - Recipients: {recipients}, CC: {cc_list}. "
-            f"Subject: '[OpenGrant] Schedule your grant strategy call'"
+            f"Subject: 'Welcome to OpenGrant – stay updated on new funding opportunities'"
         )
 
         logger.info(f"Sending notification email to contact {contact_id}")
+        signer = Signer()
+        token = signer.sign(str(contact.id))
+        unsubscribe_path = reverse("analytics:unsubscribe", kwargs={"token": token})
+        unsubscribe_url = f"{settings.HOST.rstrip('/')}{unsubscribe_path}"
         send_email(
-            subject="[OpenGrant] Schedule your grant strategy call",
+            subject="Welcome to OpenGrant – stay updated on new funding opportunities",
             recipients=recipients,
             cc=cc_list,
             template="email/notify.html",
-            context={"contact": contact, "greeting": greeting},
+            context={"contact": contact, "greeting": greeting, "unsubscribe_url": unsubscribe_url},
         )
         logger.info(f"Email sent successfully to contact {contact_id} ({contact.email})")
 

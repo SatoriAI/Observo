@@ -111,6 +111,7 @@ class ContactAdmin(ModelAdmin):
         "email",
         "survey",
         "notified",
+        "active_subscription",
         "created_at",
     )
     list_filter = (
@@ -131,7 +132,17 @@ class ContactAdmin(ModelAdmin):
     )
 
     fieldsets = (
-        ("Contact Information", {"fields": ("email", "description", "notified")}),
+        (
+            "Contact Information",
+            {
+                "fields": (
+                    "email",
+                    "description",
+                    "notified",
+                    "active_subscription",
+                )
+            },
+        ),
         ("Related Survey", {"fields": ("survey",)}),
         ("Timestamps", {"fields": ("created_at", "updated_at"), "classes": ("collapse",)}),
     )

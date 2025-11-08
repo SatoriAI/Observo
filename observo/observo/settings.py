@@ -12,8 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from datetime import timedelta
-from kombu import Queue
 from pathlib import Path
+
+from kombu import Queue
 
 # Reduce gRPC log noise (e.g., ALTS creds ignored). Must be set before gRPC initializes.
 os.environ.setdefault("GRPC_VERBOSITY", "ERROR")
@@ -232,9 +233,7 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 # Ensure the worker retries connecting to broker at startup (useful on orchestrators)
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_TASK_DEFAULT_QUEUE = "celery"
-CELERY_TASK_QUEUES = (
-    Queue("scrape"),
-)
+CELERY_TASK_QUEUES = (Queue("scrape"),)
 CELERY_TASK_CREATE_MISSING_QUEUES = True
 CELERY_TASK_ROUTES = {
     # Match by explicit task name (as defined via @shared_task(name=...))
