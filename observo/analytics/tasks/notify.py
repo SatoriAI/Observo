@@ -61,12 +61,12 @@ def notify_contact(contact_id: int) -> None:
         cc_list = ["casper@open-grant.com"]
         logger.info(
             f"Preparing to send email - Recipients: {recipients}, CC: {cc_list}. "
-            f"Subject: '[OpenGrant] Schedule your grant strategy call'"
+            f"Subject: 'Welcome to OpenGrant – stay updated on new funding opportunities'"
         )
 
         logger.info(f"Sending notification email to contact {contact_id}")
         send_email(
-            subject="[OpenGrant] Schedule your grant strategy call",
+            subject="Welcome to OpenGrant – stay updated on new funding opportunities",
             recipients=recipients,
             cc=cc_list,
             template="email/notify.html",
