@@ -32,4 +32,5 @@ urlpatterns = [
     path("auth/logout/", TokenBlacklistView.as_view(), name="auth-logout"),
     path("api/", include("analytics.urls")),
     path("api/", include("search.urls")),
+    path("api/", include("opportunity.urls")),
 ]
