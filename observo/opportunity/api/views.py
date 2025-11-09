@@ -154,4 +154,5 @@ def opportunity_summary_pdf(request, pk):
     filename_part = slugify(opportunity.identifier or title) or "opportunity"
     response = HttpResponse(pdf_bytes, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="[Summary] {filename_part.upper()}.pdf"'
+    response["Access-Control-Expose-Headers"] = "Content-Disposition"
     return response
