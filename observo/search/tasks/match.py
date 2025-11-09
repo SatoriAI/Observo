@@ -50,6 +50,7 @@ def match_proposals(pk: int, summary: str, funding: bool = True, unique_grants: 
             {
                 "id": str(opportunity.id),
                 "title": opportunity.title,
+                "url": opportunity.link,
                 "max_funding": opportunity.funding,
                 "categories": parse_categories(categories=opportunity.categories),
                 "applications": opportunity.applications,
