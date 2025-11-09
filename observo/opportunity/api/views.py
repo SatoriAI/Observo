@@ -82,6 +82,21 @@ img { max-width: 100%; page-break-inside: avoid; }
 table { border-collapse: collapse; width: 100%; margin: 0.6em 0; }
 th, td { border: 1px solid #e5e7eb; padding: 6px 8px; }
 th { background: #f3f4f6; text-align: left; }
+    /* Marketing CTA */
+    .cta-section { margin-top: 1.2em; padding-top: 0.6em; border-top: 1px solid #E5E7EB; }
+    .cta-section h2 { font-size: 14pt; }
+    .cta-section p { margin: 0.5em 0; }
+    .cta-section ul { margin: 0.6em 0 0.6em 1.4em; }
+    .cta-actions { text-align: center; }
+    a.cta-button {
+      display: inline-block;
+      background: #1a73e8;
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+    }
     </style>
   </head>
   <body>
@@ -129,6 +144,25 @@ def opportunity_summary_pdf(request, pk):
     md = MarkdownIt("commonmark").enable("table").enable("strikethrough")
     markdown_text = _ensure_title_in_markdown(title, summary_text)
     html_body = md.render(markdown_text)
+
+    # Append marketing offer and Calendly CTA
+    calendly_link = "https://calendly.com/opengrant/federal-grant-consult"
+    marketing_html = f"""
+<section class="cta-section">
+  <h2>How we can help as OpenGrant</h2>
+  <p>We help entrepreneurs win R&amp;D grants ($250K–$1.4M) at 3 times the industry success rate.</p>
+  <p>Here’s how we can support you:</p>
+  <ul>
+    <li>Identify the right grant opportunities for your project.</li>
+    <li>Write and submit your project white paper (10 pages of R&amp;D plans).</li>
+    <li>Prepare and submit the full proposal (50–60 pages) and handle all compliance requirements.</li>
+    <li>Provide a designated grant expert to guide you through the entire process, including resubmissions.</li>
+  </ul>
+  <p>Pricing: a one‑time retainer of $1,049 and a 3% success fee (paid only if we win).</p>
+  <p class="cta-actions"><a href="{calendly_link}" class="cta-button">Schedule Your Free Consultation</a></p>
+</section>
+"""
+    html_body = f"{html_body}\n{marketing_html}"
 
     # Header: OpenGrant logo on the left, identifier on the right
     logo_path = settings.BASE_DIR / "data" / "OpenGrant.png"
