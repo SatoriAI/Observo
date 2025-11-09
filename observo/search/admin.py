@@ -4,6 +4,11 @@ from django.urls import reverse
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin, StackedInline
 
+from search.actions.fetch_summary_action import fetch_summary_for_website
+from search.actions.manual_outline_request_actions import (
+    fetch_summary_for_requests,
+    generate_outline_for_requests,
+)
 from search.actions.mark_websites_as_test_action import mark_websites_as_test
 from search.actions.merge_websites_action import merge_websites
 from search.actions.rerun_generation import rerun_generation
@@ -11,10 +16,12 @@ from search.actions.send_outline_action import (
     send_outline_to_client_markdown,
     send_outline_to_owner_markdown,
 )
+from search.actions.website_manual_outline_action import generate_single_outline_for_website
 from search.actions.website_outline_action import (
     create_notification_and_prepare_outline,
 )
 from search.models import (
+    ManualOutlineRequest,
     Match,
     Notification,
     NotificationEmailBlock,
@@ -96,7 +103,6 @@ class WebsiteAdmin(ModelAdmin):
     )
     search_fields = ("url",)
     readonly_fields = (
-        "url",
         "summary",
         "created_at",
         "updated_at",
@@ -113,6 +119,8 @@ class WebsiteAdmin(ModelAdmin):
     ]
 
     actions = [
+        fetch_summary_for_website,
+        generate_single_outline_for_website,
         create_notification_and_prepare_outline,
         merge_websites,
         mark_websites_as_test,
@@ -206,3 +214,22 @@ class WorkflowAdmin(ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.annotate(prompts_count=Count("prompts"))
+
+
+@admin.register(ManualOutlineRequest)
+class ManualOutlineRequestAdmin(ModelAdmin):
+    list_display = ("website_url", "opportunity", "email", "created_at")
+    search_fields = ("website_url", "opportunity__title", "opportunity__identifier")
+    readonly_fields = ("created_at", "updated_at")
+    autocomplete_fields = ["opportunity"]
+
+    fieldsets = [
+        ("Input", {"fields": ("website_url", "summary", "opportunity")}),
+        ("Delivery", {"fields": ("email",)}),
+        ("Timestamps", {"fields": ("created_at", "updated_at")}),
+    ]
+
+    actions = [
+        fetch_summary_for_requests,
+        generate_outline_for_requests,
+    ]

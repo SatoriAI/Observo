@@ -1,6 +1,6 @@
 from search.tasks.match import match_proposals
 from search.tasks.notify import send_outline_notification, send_post_generation_notification
-from search.tasks.outline import auto_prepare_outline_for_website, prepare_outline
+from search.tasks.outline import auto_prepare_outline_for_website, prepare_outline, prepare_single_outline
 from search.tasks.scrape import scrape_website
 
 __all__ = [

@@ -1,0 +1,49 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block content %}
+  <div id="content-main" class="card">
+    <h1 class="text-2xl font-semibold mb-4">{% trans "Generate Outline for selected Opportunity" %}</h1>
+
+    <div class="mb-4">
+      {% if website.url %}
+        <span class="text-gray-500">{% trans "Website" %}:</span>
+        <strong><a href="{{ website.url }}" target="_blank" rel="noopener">{{ website.url }}</a></strong>
+      {% else %}
+        <span class="text-gray-500">{% trans "Website" %}:</span>
+        <strong>#{{ website.pk }}</strong>
+      {% endif %}
+    </div>
+
+    <form action="" method="post" novalidate>
+      {% csrf_token %}
+
+      <fieldset class="module aligned mb-4">
+        <legend class="mb-2">{% trans "Filter by title" %}</legend>
+        <div class="form-row">
+          <label for="{{ form.title.id_for_label }}">{{ form.title.label }}:</label>
+          {{ form.title }}
+          <button type="submit" name="filter" class="button default ml-2">{% trans "Filter" %}</button>
+        </div>
+      </fieldset>
+
+      <fieldset class="module aligned mb-4">
+        <legend class="mb-2">{% trans "Select Opportunity" %}</legend>
+        <div class="form-row">
+          <label for="{{ form.opportunity.id_for_label }}">{{ form.opportunity.label }}:</label>
+          {{ form.opportunity }}
+        </div>
+      </fieldset>
+
+      {% for obj in queryset %}
+        <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk }}">
+      {% endfor %}
+      <input type="hidden" name="action" value="generate_single_outline_for_website">
+
+      <div class="submit-row">
+        <input type="submit" name="apply" value="{% trans 'Generate outline' %}" class="default">
+        <a href="" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

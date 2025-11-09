@@ -86,6 +86,9 @@ class Opportunity(TimestampedModel):
         text = "\n".join([p for p in parts if p])
         return re.sub(r"[ \t]+", " ", text).strip()
 
+    def __str__(self) -> str:
+        return self.title
+
     class Meta:
         verbose_name = "Opportunity"
         verbose_name_plural = "Opportunities"

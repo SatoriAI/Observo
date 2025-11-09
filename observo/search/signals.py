@@ -2,10 +2,11 @@ import logging
 import os
 
 from django.apps import apps
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from search.models import Notification, NotificationEmailBlock
+from search.models import ManualOutlineRequest, Notification, NotificationEmailBlock, Website
 
 logger = logging.getLogger(__name__)
 
@@ -57,3 +58,23 @@ def create_default_email_block(sender, instance: Notification, created: bool, **
             instance.pk,
             exc,
         )
+
+
+@receiver(post_save, sender=Website)
+def sync_website_summary_to_requests(sender, instance: Website, **kwargs) -> None:
+    if not instance.summary or not instance.url:
+        return
+    try:
+        updated = (
+            ManualOutlineRequest.objects.filter(website_url=instance.url)
+            .filter(Q(summary__isnull=True) | Q(summary__exact=""))
+            .update(summary=instance.summary)
+        )
+        if updated:
+            logger.info(
+                "Synchronized summary from Website #%s to %s ManualOutlineRequest(s).",
+                instance.pk,
+                updated,
+            )
+    except Exception as exc:  # pragma: no cover - defensive log
+        logger.warning("Failed syncing website summary to requests: %s", exc)

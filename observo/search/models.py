@@ -130,3 +130,18 @@ class Prompt(TimestampedModel):
 
     class Meta:
         ordering = ["pk"]
+
+
+class ManualOutlineRequest(TimestampedModel):
+    website_url = models.URLField(null=True, blank=True, verbose_name="Website URL")
+    summary = models.TextField(null=True, blank=True)
+    opportunity = models.ForeignKey(
+        "opportunity.Opportunity",
+        on_delete=models.CASCADE,
+        related_name="manual_outline_requests",
+    )
+    email = models.EmailField(null=True, blank=True, help_text="Recipient email (defaults if empty).")
+
+    def __str__(self) -> str:
+        label = self.website_url or f"Summary #{self.pk}"
+        return f"ManualOutlineRequest: {label}"

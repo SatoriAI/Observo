@@ -14,6 +14,30 @@ from search.tasks.match import match_proposals
 logger = logging.getLogger(__name__)
 
 
+@shared_task(name="single_outline")
+def prepare_single_outline(notification_pk: int, opportunity_id: str) -> None:
+    notification = Notification.objects.get(pk=notification_pk)
+    logger.info(f"Preparing single Outline for Notification #{notification_pk} and Opportunity {opportunity_id}")
+
+    website = notification.match.website if notification.match else None
+    summary = getattr(website, "summary", None) if website else None
+    if not summary:
+        logger.warning(f"Notification #{notification_pk} has no website summary; cannot generate outline.")
+        return
+
+    opportunity = Opportunity.objects.get(pk=opportunity_id)
+    outline = Outline.objects.create(
+        opportunity=opportunity,
+        notification=notification,
+        title=opportunity.title,
+        content=get_content(summary=summary, identifier=opportunity.id, debug=False),
+    )
+    logger.info(f"Outline #{outline.pk} created successfully (single outline mode)")
+
+    notification.set_ready()
+    send_post_generation_notification.delay(notification.pk)
+
+
 @shared_task(name="outline")
 def prepare_outline(pk: int) -> None:
     notification = Notification.objects.get(pk=pk)
