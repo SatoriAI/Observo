@@ -33,9 +33,27 @@ _HTML_TEMPLATE = Template(
 
 @font-face {
   font-family: "Times New Roman";
-  src: url("fonts/TimesNewRoman.ttf") format("truetype");
-  font-weight: normal;
+  src: url("{{ font_url }}") format("truetype");
+  font-weight: 400;
   font-style: normal;
+}
+@font-face {
+  font-family: "Times New Roman";
+  src: url("{{ font_url }}") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Times New Roman";
+  src: url("{{ font_url }}") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: "Times New Roman";
+  src: url("{{ font_url }}") format("truetype");
+  font-weight: 700;
+  font-style: italic;
 }
 
 .page-header-left  { position: running(header-left); }
@@ -177,12 +195,17 @@ def opportunity_summary_pdf(request, pk):
     # Footer: placeholder contact info (as requested)
     footer_text = "OpenGrant Inc."
 
+    # Absolute font URI to avoid resource resolution issues (ensures embedding)
+    tnr_path = (settings.BASE_DIR / "data" / "fonts" / "TimesNewRoman.ttf").resolve()
+    font_url = tnr_path.as_uri() if tnr_path.exists() else ""
+
     html_full = _HTML_TEMPLATE.render(
         html=html_body,
         logo_data_uri=logo_data_uri,
         header_right_text=header_right_text,
         footer_text=footer_text,
         doc_title=title,
+        font_url=font_url,
     )
 
     # Generate PDF
