@@ -31,6 +31,13 @@ _HTML_TEMPLATE = Template(
   }
 }
 
+@font-face {
+  font-family: "Times New Roman";
+  src: url("fonts/TimesNewRoman.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 .page-header-left  { position: running(header-left); }
 .page-header-right { position: running(header-right); text-align: right; white-space: nowrap; font-size: 10pt; color: #000; }
 
