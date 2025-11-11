@@ -11,24 +11,16 @@ class OpportunityAdmin(ModelAdmin):
         "head",
         "funding",
         "vectorized",
+        "created_at",
     )
     list_filter = ("vectorized",)
     search_fields = (
         "title",
         "head",
     )
+    ordering = ("-created_at",)
     readonly_fields = (
         "id",
-        "identifier",
-        "code",
-        "link",
-        "agency",
-        "head",
-        "funding",
-        "awards",
-        "opened",
-        "closed",
-        "archived",
         "vectorized",
         "source",
         "injection_date",

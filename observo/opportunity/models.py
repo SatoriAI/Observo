@@ -49,7 +49,7 @@ class Opportunity(TimestampedModel):
 
     vectorized = models.BooleanField(default=False)
     source = models.CharField(max_length=255, null=True, blank=True)
-    injection_date = models.DateField(verbose_name="Injection Date")
+    injection_date = models.DateField(null=True, blank=True, verbose_name="Injection Date")
 
     def describe(self) -> str:
         parts = []
