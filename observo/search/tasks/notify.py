@@ -26,18 +26,50 @@ def send_outline_notification(pk: int, email: str, mode: int = OutlineAction) ->
     opportunities = []
 
     for outline in notification.outlines.order_by("-created_at")[:3]:
-        opportunity_id = _filter(grants=grants_list, title=outline.title)
-        opportunity = Opportunity.objects.get(pk=opportunity_id)
-        grants.append(opportunity)
-        opportunities.append(opportunity.identifier)
+        # Try to resolve Opportunity in a robust way:
+        # 1) from proposals list (pk)
+        # 2) via Outline.opportunity FK
+        # 3) by matching identifier == Outline.title
+        # 4) fall back to a minimal dict using Outline.title as identifier
+        opportunity = None
+        identifier = None
 
-        tmp_path = os.path.join(tempfile.gettempdir(), f"{opportunity.identifier}.pdf")
+        opportunity_id = _filter(grants=grants_list, title=outline.title or "")
+        if opportunity_id:
+            try:
+                opportunity = Opportunity.objects.get(pk=opportunity_id)
+            except Opportunity.DoesNotExist:
+                opportunity = None
+
+        if not opportunity and getattr(outline, "opportunity_id", None):
+            opportunity = outline.opportunity
+
+        if not opportunity and (outline.title or "").strip():
+            opportunity = Opportunity.objects.filter(identifier=outline.title).first()
+
+        if opportunity:
+            identifier = opportunity.identifier
+            grants.append(opportunity)
+        else:
+            # Final fallback: use Outline.title as the identifier (Opportunity Number)
+            identifier = (outline.title or "Unknown").strip() or "Unknown"
+            grants.append(
+                {
+                    "identifier": identifier,
+                    "title": outline.title or identifier,
+                    "link": None,
+                }
+            )
+
+        opportunities.append(identifier)
+
+        tmp_path = os.path.join(tempfile.gettempdir(), f"{identifier}.pdf")
 
         generator.generate(
-            title="Outline for " + outline.title,
+            title="Outline for " + (outline.title or identifier),
             text=outline.content,
             output_path=tmp_path,
-            header_right_text=opportunity.identifier,
+            header_right_text=identifier,
         )
         tmp_paths.append(tmp_path)
 
