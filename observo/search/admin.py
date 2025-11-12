@@ -13,6 +13,7 @@ from search.actions.mark_websites_as_test_action import mark_websites_as_test
 from search.actions.merge_websites_action import merge_websites
 from search.actions.rerun_generation import rerun_generation
 from search.actions.send_outline_action import (
+    download_notification_pdfs,
     send_outline_to_client_markdown,
     send_outline_to_owner_markdown,
 )
@@ -172,6 +173,7 @@ class NotificationAdmin(ModelAdmin):
         rerun_generation,
         send_outline_to_client_markdown,
         send_outline_to_owner_markdown,
+        download_notification_pdfs,
     ]
 
     @admin.display(description="Website", ordering="match__website__url")
