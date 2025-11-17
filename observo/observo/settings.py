@@ -222,22 +222,33 @@ EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
 GEMINI_API_KEY = env("GEMINI_API_KEY", default=None)
 
 # Celery Configuration
-# Prefer explicit CELERY_* vars, but fall back to REDIS_URL if present
-CELERY_BROKER_URL = env("CELERY_BROKER_URL", default=env("REDIS_URL", default="redis://localhost:6379/0"))
-CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default=CELERY_BROKER_URL)
 CELERY_TIMEZONE = TIME_ZONE
-CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 5 * 60 * 60  # 5 hours
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_TASK_TRACK_STARTED = True
+
 CELERY_WORKER_DISABLE_RATE_LIMITS = True
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
-# Ensure the worker retries connecting to broker at startup (useful on orchestrators)
-CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-CELERY_TASK_DEFAULT_QUEUE = "celery"
-CELERY_TASK_QUEUES = (Queue("scrape"),)
-CELERY_TASK_CREATE_MISSING_QUEUES = True
+
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default=CELERY_BROKER_URL)
+
+CELERY_TASK_DEFAULT_QUEUE = "fast"
+CELERY_TASK_QUEUES = (
+    Queue("fast"),
+    Queue("slow"),
+)
+
 CELERY_TASK_ROUTES = {
-    # Match by explicit task name (as defined via @shared_task(name=...))
-    "scrape_website": {"queue": "scrape"},
-    # Also match by fully-qualified dotted path, in case the explicit name changes
-    "search.tasks.scrape.scrape_website": {"queue": "scrape"},
+    # App: Analytics
+    "notify_contact": {"queue": "fast"},
+    "notify_new_survey": {"queue": "fast"},
+    # App: Search
+    "auto_prepare_outline_for_website": {"queue": "slow"},
+    "prepare_outline": {"queue": "slow"},
+    "prepare_single_outline": {"queue": "slow"},
+    "match_proposals": {"queue": "fast"},
+    "scrape_website": {"queue": "fast"},
+    "send_outline_notification": {"queue": "fast"},
+    "send_post_generation_notification": {"queue": "fast"},
 }

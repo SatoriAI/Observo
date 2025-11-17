@@ -10,4 +10,5 @@ __all__ = [
     "prepare_outline",
     "auto_prepare_outline_for_website",
     "scrape_website",
+    "prepare_single_outline",
 ]

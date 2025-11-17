@@ -1,0 +1,11 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "./Dockerfile"
+
+[deploy]
+startCommand = """
+    sh -c '
+        cd observo &&
+        uv run --no-sync --no-dev celery -A observo.celery worker -n worker@%h -Q slow --loglevel=info --concurrency 6 --prefetch-multiplier=1 -Ofair
+    '
+"""
